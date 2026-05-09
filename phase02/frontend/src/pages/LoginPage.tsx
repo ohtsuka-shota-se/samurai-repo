@@ -9,7 +9,7 @@ const ERROR_MAP: Record<string, string> = {
   NotAuthorizedException: 'メールアドレスまたはパスワードが違います',
   UserNotFoundException: 'ユーザーが見つかりません',
   UsernameExistsException: 'このメールアドレスはすでに登録されています',
-  InvalidPasswordException: 'パスワードは8文字以上で、大文字・小文字・数字を含めてください',
+  InvalidPasswordException: 'パスワードは8文字以上で、大文字・小文字・数字・記号（例: !@#$）を含めてください',
   CodeMismatchException: '確認コードが違います',
   ExpiredCodeException: '確認コードの有効期限が切れています。再度サインアップしてください',
   InvalidParameterException: '入力内容に誤りがあります',
@@ -129,7 +129,7 @@ export default function LoginPage() {
                 <label>
                   パスワード
                   {mode === 'signup' && (
-                    <span className="hint">（8文字以上・大文字・小文字・数字を含む）</span>
+                    <span className="hint">（8文字以上・大文字・小文字・数字・記号を含む）</span>
                   )}
                 </label>
                 <input

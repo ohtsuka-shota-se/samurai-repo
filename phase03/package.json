@@ -1,0 +1,12 @@
+{
+  "name": "claudecode-phase03",
+  "version": "1.0.0",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "dev": "concurrently -n backend,frontend -c blue,green \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "build": "cd frontend && npm run build && cd ../backend && npm run build"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}

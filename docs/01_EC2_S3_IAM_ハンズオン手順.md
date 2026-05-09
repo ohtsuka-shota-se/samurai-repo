@@ -7,6 +7,29 @@
 
 ---
 
+## 環境イメージ
+
+```mermaid
+graph TB
+    User["👤 ユーザー\n（ブラウザ）"]
+
+    subgraph AWS["AWS クラウド"]
+        subgraph EC2Box["EC2インスタンス (Ubuntu 24.04 / t2.micro)"]
+            FE["React フロントエンド\n(ビルド済み静的ファイル)"]
+            BE["Node.js + Express バックエンド\n(ポート 3000)"]
+            FE -->|"画面操作 → APIリクエスト"| BE
+        end
+
+        IAM["IAMロール\nhandson-ec2-s3-role\n(AmazonS3FullAccess)"]
+        S3["S3 バケット\nhandson-[名前]-files\n(ファイル保存)"]
+
+        IAM -.->|アタッチ\n認証情報を自動提供| EC2Box
+        BE -->|"AWS SDK v3\nファイルの読み書き"| S3
+    end
+
+    User -->|"HTTP :3000"| FE
+```
+
 ## ゴール
 
 S3バケットにファイルをアップロード・一覧表示・ダウンロード・削除できるWebアプリをEC2上で動かす。

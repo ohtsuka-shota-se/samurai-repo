@@ -22,13 +22,15 @@ const BUCKET = process.env.S3_BUCKET_NAME || ''
 router.get('/', async (_req: Request, res: Response) => {
   try {
     const result = await s3.send(new ListObjectsV2Command({ Bucket: BUCKET }))
-    const files = (result.Contents || []).map(obj => ({
+    const files = (result.Contents ?? []).map(obj => ({
       key: obj.Key ?? '',
       size: obj.Size ?? 0,
       lastModified: obj.LastModified ?? new Date(),
     }))
     res.json(files)
-  } catch {
+  } catch (e) {
+    const err = e as Error & { name?: string }
+    console.error('[S3 ListObjects Error]', err.name, err.message)
     res.status(500).json({ error: 'ファイル一覧の取得に失敗しました' })
   }
 })
@@ -40,13 +42,15 @@ router.post('/upload', upload.single('file'), async (req: Request, res: Response
     return
   }
   try {
+    // multerはファイル名をlatin1で読むためUTF-8に変換する
+    const filename = Buffer.from(req.file.originalname, 'latin1').toString('utf8')
     await s3.send(new PutObjectCommand({
       Bucket: BUCKET,
-      Key: req.file.originalname,
+      Key: filename,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
     }))
-    res.json({ message: 'アップロード成功', key: req.file.originalname })
+    res.json({ message: 'アップロード成功', key: filename })
   } catch {
     res.status(500).json({ error: 'アップロードに失敗しました' })
   }

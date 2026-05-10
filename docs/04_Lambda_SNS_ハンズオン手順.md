@@ -7,7 +7,7 @@
 
 ---
 ## 完成後イメージ
-![](ProcedureManual/images/phase04-完成後イメージ01.png)
+![](images/phase04-完成後イメージ01.png)
 
 ## 環境イメージ
 

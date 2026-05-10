@@ -6,6 +6,9 @@
 対象: AWS未経験者向けハンズオン（5回目）
 
 ---
+## 完成後イメージ
+
+![](images/phase05-完成後イメージ01.png)
 
 ## 環境イメージ
 
@@ -41,6 +44,8 @@ graph TB
     User -->|"ログイン → JWT 取得"| Cognito
     User -->|"JWT付きで分析リクエスト"| EC2Box
 ```
+
+![](images/phase05.png)
 
 ## ゴール
 

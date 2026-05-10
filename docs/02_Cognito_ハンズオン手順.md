@@ -26,7 +26,7 @@ graph TB
             end
         end
 
-        IAM["IAMロール\nhandson-ec2-s3-role"]
+        IAM["IAMロール\nhandson-ec2-role"]
         S3["🪣 S3 バケット\nhandson-[名前]-files"]
 
         IAM -.->|アタッチ| EC2Box

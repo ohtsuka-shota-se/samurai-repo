@@ -26,7 +26,7 @@ graph TB
             end
         end
 
-        IAM_EC2["IAMロール\nhandson-ec2-s3-role"]
+        IAM_EC2["IAMロール\nhandson-ec2-role"]
         IAM_Lambda["IAMロール\nhandson-lambda-role"]
         S3["🪣 S3 バケット"]
         DDB["🗄️ DynamoDB\nhandson-reviews"]

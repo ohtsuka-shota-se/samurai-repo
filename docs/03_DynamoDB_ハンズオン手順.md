@@ -26,7 +26,7 @@ graph TB
             end
         end
 
-        IAM["IAMロール\nhandson-ec2-s3-role\n(S3FullAccess + DynamoDBFullAccess)"]
+        IAM["IAMロール\nhandson-ec2-role\n(S3FullAccess + DynamoDBFullAccess)"]
         S3["🪣 S3 バケット\nhandson-[名前]-files"]
         DDB["🗄️ DynamoDB\nhandson-reviews"]
 
@@ -218,10 +218,10 @@ sequenceDiagram
 
 ## [2] IAMロールに DynamoDB 権限を追加
 
-Phase 1 で作成した `handson-ec2-s3-role` に DynamoDB へのアクセス権限を追加する。
+Phase 1 で作成した `handson-ec2-role` に DynamoDB へのアクセス権限を追加する。
 
 1. AWSマネジメントコンソール → 「IAM」を開く
-2. 左メニュー「ロール」→ `handson-ec2-s3-role` をクリック
+2. 左メニュー「ロール」→ `handson-ec2-role` をクリック
 3. 「許可を追加」→「ポリシーをアタッチ」
 4. 検索欄に `AmazonDynamoDBFullAccess_v2` と入力
 5. `AmazonDynamoDBFullAccess_v2` にチェックを入れて「許可を追加」

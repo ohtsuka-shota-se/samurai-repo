@@ -6,6 +6,8 @@
 対象: AWS未経験者向けハンズオン（4回目）
 
 ---
+## 完成後イメージ
+![](ProcedureManual/images/phase04-完成後イメージ01.png)
 
 ## 環境イメージ
 
@@ -50,6 +52,8 @@ graph TB
     User -->|"ログイン → JWT 取得"| Cognito
     User -->|"JWT付きでレビュー一覧・ファイル操作"| EC2Box
 ```
+
+![](ProcedureManual/images/phase04.png)
 
 ## ゴール
 

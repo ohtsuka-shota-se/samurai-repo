@@ -6,6 +6,10 @@
 対象: AWS未経験者向けハンズオン（2回目）
 
 ---
+## 完成後イメージ
+
+![](images/phase02-完成後イメージ01.png)
+![](images/phase01-完成後イメージ.png)
 
 ## 環境イメージ
 
@@ -39,7 +43,7 @@ graph TB
     User -->|"③ JWT付きで HTTP :3000 にアクセス"| EC2Box
 ```
 
-![アーキテクチャ図](images/aws04-ページ-24.drawio.png)
+![アーキテクチャ図](images/phase02.png)
 
 ## ゴール
 

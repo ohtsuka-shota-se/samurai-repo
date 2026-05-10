@@ -39,6 +39,8 @@ graph TB
     User -->|"③ JWT付きで HTTP :3000 にアクセス"| EC2Box
 ```
 
+![アーキテクチャ図](images/aws04-ページ-24.drawio.png)
+
 ## ゴール
 
 ログインしたユーザーだけがS3ファイル管理アプリを使えるようにする。
@@ -325,6 +327,14 @@ JWT の署名検証に使う。
 
 ## [3] フロントエンドの .env 設定
 
+**まず EC2 に SSH 接続し、root に切り替えて最新コードを取得する:**
+
+```bash
+sudo su -
+cd ~/samurai-repo
+git pull
+```
+
 **実行場所: `~/samurai-repo/phase02/frontend`**
 
 ```bash
@@ -367,11 +377,10 @@ COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx     ← メモしたクライアン
 
 ## [5] EC2でアプリを更新・起動
 
-**実行場所: `~/samurai-repo`**
+**実行場所: `~/samurai-repo`**（[3] の続き。すでに root かつ git pull 済みの前提）
 
 ```bash
 cd ~/samurai-repo
-git pull
 
 # フロントエンドをビルド
 cd phase02/frontend

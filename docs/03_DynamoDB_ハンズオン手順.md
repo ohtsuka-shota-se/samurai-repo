@@ -41,7 +41,7 @@ graph TB
     User -->|"③ JWT付きでレビュー一覧・ファイル操作"| EC2Box
 ```
 
-![アーキテクチャ図](images/aws04-ページ-25.drawio.png)
+![アーキテクチャ図](images/phase03.png)
 
 ## ゴール
 

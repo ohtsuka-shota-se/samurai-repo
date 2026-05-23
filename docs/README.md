@@ -10,3 +10,4 @@ AWS学習ハンズオンの手順書一覧です。
 | Phase 3 | DynamoDB（レビュー投稿・蓄積） | [03_DynamoDB_ハンズオン手順.md](./03_DynamoDB_ハンズオン手順.md) |
 | Phase 4 | Lambda・SNS（レビュー投稿メール通知） | [04_Lambda_SNS_ハンズオン手順.md](./04_Lambda_SNS_ハンズオン手順.md) |
 | Phase 5 | Bedrock（AI分析・傾向可視化） | [05_Bedrock_ハンズオン手順.md](./05_Bedrock_ハンズオン手順.md) |
+| Phase 6 | ALB + Auto Scaling（高可用性構成） | [06_ALB + Auto Scaling（高可用性構成）_ハンズオン手順.md](./06_ALB_AutoScaling_ハンズオン手順.md) |

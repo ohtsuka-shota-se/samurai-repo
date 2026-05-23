@@ -1,0 +1,240 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Phase 7 - CloudFront + S3 静的配信（+ 任意でカスタムドメイン）
+  フロントエンド（React）を S3+CloudFront で配信し、
+  /api/* は ALB 経由で EC2 に転送するハイブリッド構成
+
+# ============================================================
+# パラメータ
+# ============================================================
+Parameters:
+
+  AlbDnsName:
+    Type: String
+    Description: >
+      Phase 6 で作成した ALB の DNS 名
+      （Phase 6 スタックの「出力」タブ → AlbDnsName の値をコピー）
+
+  DomainName:
+    Type: String
+    Default: ""
+    Description: >
+      【任意】カスタムドメイン名（例: handson.example.com）
+      独自ドメインを使わない場合は空のままでOK
+      設定する場合は AcmCertificateArn も必須
+
+  AcmCertificateArn:
+    Type: String
+    Default: ""
+    Description: >
+      【任意・DomainName設定時は必須】
+      us-east-1（バージニア）で発行した ACM 証明書の ARN
+      ※ CloudFront 用の証明書は必ず us-east-1 で作成すること
+      （ACMコンソール → バージニア北部リージョン → 証明書ARN）
+
+  HostedZoneId:
+    Type: String
+    Default: ""
+    Description: >
+      【任意・Route53でDNS管理している場合】
+      Route 53 ホストゾーンの ID
+      （Route 53コンソール → ホストゾーン → ホストゾーンID）
+
+# ============================================================
+# 条件分岐
+# ============================================================
+Conditions:
+  # DomainName と AcmCertificateArn の両方が設定されている場合
+  HasCustomDomain: !And
+    - !Not [!Equals [!Ref DomainName, ""]]
+    - !Not [!Equals [!Ref AcmCertificateArn, ""]]
+
+  # Route 53 でDNSレコードも自動作成する場合
+  HasRoute53: !And
+    - !Condition HasCustomDomain
+    - !Not [!Equals [!Ref HostedZoneId, ""]]
+
+# ============================================================
+# リソース定義
+# ============================================================
+Resources:
+
+  # ----------------------------------------------------------
+  # S3 バケット（Reactビルド成果物の置き場所）
+  # DeletionPolicy: Retain → スタック削除後もバケットを残す
+  # （ファイルを再アップロードしなくて済む）
+  # ----------------------------------------------------------
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub "handson-frontend-${AWS::AccountId}"
+      # パブリックアクセスはすべてブロック（CloudFront経由のみ許可）
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: handson-frontend
+
+  # ----------------------------------------------------------
+  # CloudFront OAC（Origin Access Control）
+  # S3バケットへのアクセスをCloudFront経由のみに制限する仕組み
+  # ----------------------------------------------------------
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: handson-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  # S3バケットポリシー: このCloudFrontディストリビューションのみ読み取りを許可
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  # ----------------------------------------------------------
+  # CloudFront ディストリビューション
+  # ----------------------------------------------------------
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: handson Phase 7
+
+        # カスタムドメインが設定されている場合のみ有効
+        Aliases: !If
+          - HasCustomDomain
+          - [!Ref DomainName]
+          - !Ref AWS::NoValue
+
+        # SSL証明書の設定
+        ViewerCertificate: !If
+          - HasCustomDomain
+          - AcmCertificateArn: !Ref AcmCertificateArn
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+          - CloudFrontDefaultCertificate: true  # *.cloudfront.net ドメインのデフォルト証明書
+
+        # --------------------------------------------------
+        # オリジン定義（転送先の設定）
+        # --------------------------------------------------
+        Origins:
+          # オリジン1: S3（Reactアプリの静的ファイル）
+          - Id: S3Origin
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ""  # OAC使用時は空にする
+
+          # オリジン2: ALB（APIリクエストの転送先）
+          - Id: AlbOrigin
+            DomainName: !Ref AlbDnsName
+            CustomOriginConfig:
+              OriginProtocolPolicy: http-only
+              HTTPPort: 80
+
+        # --------------------------------------------------
+        # デフォルトの動作: すべてのリクエストをS3に転送
+        # （Reactアプリの静的ファイルを返す）
+        # --------------------------------------------------
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          # CachingOptimized: 静的ファイルに最適なキャッシュ設定（AWS管理ポリシー）
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          AllowedMethods: [GET, HEAD]
+          CachedMethods: [GET, HEAD]
+          Compress: true
+
+        # --------------------------------------------------
+        # /api/* は ALB に転送（APIリクエストはキャッシュしない）
+        # --------------------------------------------------
+        CacheBehaviors:
+          - PathPattern: "/api/*"
+            TargetOriginId: AlbOrigin
+            ViewerProtocolPolicy: allow-all
+            # CachingDisabled: APIはキャッシュせず毎回EC2に届ける（AWS管理ポリシー）
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            AllowedMethods: [DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT]
+            CachedMethods: [GET, HEAD]
+
+        # --------------------------------------------------
+        # React SPA のルーティング対応
+        # 直接URLを入力したとき（例: /reviews）に404にならないよう
+        # → index.html を返してReact側でルーティングさせる
+        # --------------------------------------------------
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+
+        DefaultRootObject: index.html
+
+      Tags:
+        - Key: Name
+          Value: handson-cloudfront
+
+  # ----------------------------------------------------------
+  # Route 53 DNS レコード
+  # カスタムドメインかつ HostedZoneId が設定されている場合のみ作成
+  # ----------------------------------------------------------
+  DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Condition: HasRoute53
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        # CloudFront は必ず Z2FDTNDATAQYW2 のホストゾーンに属する（固定値）
+        HostedZoneId: Z2FDTNDATAQYW2
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+
+# ============================================================
+# 出力
+# ============================================================
+Outputs:
+
+  CloudFrontUrl:
+    Description: CloudFront のデフォルトURL（カスタムドメインなしの場合はこちらでアクセス）
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+
+  CustomDomainUrl:
+    Condition: HasCustomDomain
+    Description: カスタムドメインのURL
+    Value: !Sub "https://${DomainName}"
+
+  FrontendBucketName:
+    Description: >
+      React ビルド成果物（npm run build の dist/ フォルダの中身）を
+      アップロードする S3 バケット名
+    Value: !Ref FrontendBucket
+
+  UploadCommand:
+    Description: ビルド成果物をS3にアップロードするコマンド（参考）
+    Value: !Sub "aws s3 sync ./dist s3://${FrontendBucket} --delete"

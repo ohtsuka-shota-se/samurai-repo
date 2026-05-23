@@ -1,0 +1,37 @@
+[
+  {
+    "ParameterKey": "VpcId",
+    "ParameterValue": "vpc-xxxxxxxxxxxxxxxxx",
+    "Comment": "VPCコンソール → VPC → handson-vpc の VPC ID"
+  },
+  {
+    "ParameterKey": "ExistingSubnet1aId",
+    "ParameterValue": "subnet-xxxxxxxxxxxxxxxxx",
+    "Comment": "VPCコンソール → サブネット → handson-public-subnet-1a のサブネット ID"
+  },
+  {
+    "ParameterKey": "RouteTableId",
+    "ParameterValue": "rtb-xxxxxxxxxxxxxxxxx",
+    "Comment": "VPCコンソール → ルートテーブル → handson-public-subnet に関連付けられている RTB の ID"
+  },
+  {
+    "ParameterKey": "EC2SecurityGroupId",
+    "ParameterValue": "sg-xxxxxxxxxxxxxxxxx",
+    "Comment": "EC2コンソール → セキュリティグループ → handson-sg のセキュリティグループ ID"
+  },
+  {
+    "ParameterKey": "InstanceProfileName",
+    "ParameterValue": "handson-ec2-role",
+    "Comment": "IAMロール名と同じ。変更していなければデフォルト値のままでOK"
+  },
+  {
+    "ParameterKey": "AmiId",
+    "ParameterValue": "ami-xxxxxxxxxxxxxxxxx",
+    "Comment": "EC2コンソール → AMI → handson-app-ami の AMI ID（AMI作成後に記入）"
+  },
+  {
+    "ParameterKey": "KeyPairName",
+    "ParameterValue": "your-key-pair-name",
+    "Comment": "EC2コンソール → キーペア → 使用しているキーペア名"
+  }
+]

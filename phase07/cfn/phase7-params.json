@@ -1,0 +1,22 @@
+[
+  {
+    "ParameterKey": "AlbDnsName",
+    "ParameterValue": "handson-alb-xxxxxxxxxxxx.ap-northeast-1.elb.amazonaws.com",
+    "Comment": "CloudFormationコンソール → handson-phase6スタック → 出力タブ → AlbDnsName の値"
+  },
+  {
+    "ParameterKey": "DomainName",
+    "ParameterValue": "",
+    "Comment": "独自ドメインを使う場合のみ入力（例: handson.example.com）。不要なら空のままでOK"
+  },
+  {
+    "ParameterKey": "AcmCertificateArn",
+    "ParameterValue": "",
+    "Comment": "DomainNameを設定した場合のみ必須。us-east-1（バージニア）で発行した証明書のARN"
+  },
+  {
+    "ParameterKey": "HostedZoneId",
+    "ParameterValue": "",
+    "Comment": "Route53でDNSを管理している場合のみ入力。不要なら空のままでOK"
+  }
+]

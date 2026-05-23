@@ -1,0 +1,237 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Phase 6 - ALB + Auto Scaling Group
+  作成されるリソース: handson-public-subnet-1c / handson-alb-sg /
+  handson-tg / handson-alb / handson-lt / handson-asg
+
+# ============================================================
+# パラメータ（デプロイ前に phase6-params.json を編集して設定する）
+# ============================================================
+Parameters:
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: >
+      handson-vpc の ID
+      （VPCコンソール → VPC → handson-vpc の「VPC ID」列の値）
+
+  ExistingSubnet1aId:
+    Type: AWS::EC2::Subnet::Id
+    Description: >
+      既存のパブリックサブネット（handson-public-subnet-1a）の ID
+      （VPCコンソール → サブネット → handson-public-subnet の「サブネット ID」列の値）
+
+  RouteTableId:
+    Type: String
+    Description: >
+      既存のルートテーブルの ID
+      （VPCコンソール → ルートテーブル → handson-public-subnet に関連付けられている RTB の「ルートテーブル ID」列の値）
+
+  EC2SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: >
+      既存EC2のセキュリティグループ（handson-sg）の ID
+      （EC2コンソール → セキュリティグループ → handson-sg の「セキュリティグループ ID」列の値）
+
+  InstanceProfileName:
+    Type: String
+    Default: handson-ec2-role
+    Description: >
+      EC2 IAMインスタンスプロファイルの名前
+      （IAMコンソール → ロール → handson-ec2-role の名前をそのまま使う）
+
+  AmiId:
+    Type: AWS::EC2::Image::Id
+    Description: >
+      Phase 5 完了後に作成した AMI の ID
+      （EC2コンソール → AMI → handson-app-ami の「AMI ID」列の値）
+      ※ 手順 [3] でAMIを作成した後、この値を phase6-params.json に記入してからデプロイする
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: >
+      EC2 に使用するキーペアの名前
+      （EC2コンソール → キーペア → 使用しているキーペア名）
+
+# ============================================================
+# リソース定義
+# ============================================================
+Resources:
+
+  # ----------------------------------------------------------
+  # サブネット（AZ-c 用）
+  # Phase 1 で作成した 1a に加え、1c にも追加する
+  # ----------------------------------------------------------
+  PublicSubnet1c:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VpcId
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: ap-northeast-1c
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: handson-public-subnet-1c
+
+  # 新しいサブネットにルートテーブルを関連付け
+  # （これをしないとインターネットに出られない）
+  SubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1c
+      RouteTableId: !Ref RouteTableId
+
+  # ----------------------------------------------------------
+  # セキュリティグループ
+  # ----------------------------------------------------------
+
+  # ALB用: インターネットからポート80のアクセスを受け付ける
+  AlbSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: handson-alb-sg
+      GroupDescription: ALB - allow HTTP port 80 from internet
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: インターネットからのHTTPを許可
+      Tags:
+        - Key: Name
+          Value: handson-alb-sg
+
+  # 既存EC2のSGに「ALBからポート3000を許可」するルールを追加
+  # （ALBからEC2アプリへの転送を可能にする）
+  EC2IngressFromAlb:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref EC2SecurityGroupId
+      IpProtocol: tcp
+      FromPort: 3000
+      ToPort: 3000
+      SourceSecurityGroupId: !Ref AlbSecurityGroup
+      Description: ALBからEC2アプリポート3000への転送を許可
+
+  # ----------------------------------------------------------
+  # ターゲットグループ
+  # ALBがアクセスを振り分ける宛先グループ
+  # ----------------------------------------------------------
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: handson-tg
+      Protocol: HTTP
+      Port: 3000
+      VpcId: !Ref VpcId
+      TargetType: instance
+      HealthCheckPath: /
+      HealthCheckIntervalSeconds: 30
+      HealthyThresholdCount: 2
+      UnhealthyThresholdCount: 3
+      Tags:
+        - Key: Name
+          Value: handson-tg
+
+  # ----------------------------------------------------------
+  # ALB（Application Load Balancer）
+  # ----------------------------------------------------------
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: handson-alb
+      Scheme: internet-facing
+      Type: application
+      SecurityGroups:
+        - !Ref AlbSecurityGroup
+      Subnets:
+        - !Ref ExistingSubnet1aId
+        - !Ref PublicSubnet1c
+      Tags:
+        - Key: Name
+          Value: handson-alb
+
+  # ALBリスナー: ポート80で受け取りターゲットグループへ転送
+  AlbListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  # ----------------------------------------------------------
+  # 起動テンプレート
+  # Auto Scaling が EC2 を起動するときの設計図
+  # ----------------------------------------------------------
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: handson-lt
+      LaunchTemplateData:
+        ImageId: !Ref AmiId
+        InstanceType: t2.micro
+        KeyName: !Ref KeyPairName
+        SecurityGroupIds:
+          - !Ref EC2SecurityGroupId
+        IamInstanceProfile:
+          Name: !Ref InstanceProfileName
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: handson-asg-instance
+
+  # ----------------------------------------------------------
+  # Auto Scaling グループ
+  # ----------------------------------------------------------
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: handson-asg
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplate
+        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 4
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        - !Ref ExistingSubnet1aId
+        - !Ref PublicSubnet1c
+      TargetGroupARNs:
+        - !Ref TargetGroup
+      HealthCheckType: ELB
+      HealthCheckGracePeriod: 120
+      Tags:
+        - Key: Name
+          Value: handson-asg-instance
+          PropagateAtLaunch: true
+
+  # スケーリングポリシー: CPU使用率が50%を超えたら自動でEC2を追加
+  ScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref AutoScalingGroup
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 50.0
+
+# ============================================================
+# 出力（デプロイ完了後にコンソールで確認できる値）
+# ============================================================
+Outputs:
+
+  AppUrl:
+    Description: アプリのURL（ブラウザでこのURLにアクセスして動作確認）
+    Value: !Sub "http://${ApplicationLoadBalancer.DNSName}"
+
+  AlbDnsName:
+    Description: ALBのDNS名（Phase 7テンプレートの AlbDnsName パラメータに設定する）
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
+    Export:
+      Name: !Sub "${AWS::StackName}-AlbDnsName"

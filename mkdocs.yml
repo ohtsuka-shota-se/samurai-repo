@@ -1,0 +1,52 @@
+site_name: AWS 学習ハンズオン
+site_description: AWS の主要サービスを段階的に学ぶためのハンズオン手順書
+site_url: https://ohtsuka-shota-se.github.io/samurai-repo/
+
+theme:
+  name: material
+  language: ja
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+  palette:
+    - scheme: default
+      primary: deep orange
+      accent: orange
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search:
+      lang: ja
+
+nav:
+  - ホーム: index.md
+  - ハンズオン手順書:
+    - Phase 1 - EC2・S3・IAM・VPC: 01_EC2_S3_IAM_VPC_ハンズオン手順.md
+    - Phase 2 - Cognito（認証）: 02_Cognito_ハンズオン手順.md
+    - Phase 3 - DynamoDB: 03_DynamoDB_ハンズオン手順.md
+    - Phase 4 - Lambda・SNS: 04_Lambda_SNS_ハンズオン手順.md
+    - Phase 5 - Bedrock（AI）: 05_Bedrock_ハンズオン手順.md
+    - Phase 6 - ALB・Auto Scaling: 06_ALB_AutoScaling_ハンズオン手順.md
+    - Phase 7 - CloudFront（CDN）: 07_CloudFront_ハンズオン手順.md
+  - 参考資料:
+    - ローカル開発環境のセットアップ: ローカル開発環境のrun-dev手順.md
+    - 修正・変更履歴: 修正・変更履歴.md
+    - GitHub管理方針: GitHub管理方針とpush手順.md

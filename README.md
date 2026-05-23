@@ -4,7 +4,7 @@ AWS の主要サービスを段階的に学ぶためのハンズオン用アプ�
 
 ## ハンズオン手順書
 
-→ **[docs/ フォルダ](./docs/README.md)** を参照してください。
+→ **[GitHub Pages（手順書サイト）](https://ohtsuka-shota-se.github.io/samurai-repo/)** で閲覧できます。
 
 ## フェーズ構成
 

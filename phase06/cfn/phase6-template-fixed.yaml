@@ -147,7 +147,7 @@ Resources:
       LaunchTemplateName: handson-lt
       LaunchTemplateData:
         ImageId: !FindInMap [Env, Config, AmiId]
-        InstanceType: t2.micro
+        InstanceType: t3.micro
         KeyName: !FindInMap [Env, Config, KeyPairName]
         SecurityGroupIds:
           - !FindInMap [Env, Config, EC2SecurityGroupId]

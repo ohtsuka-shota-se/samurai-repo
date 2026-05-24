@@ -1,0 +1,22 @@
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/root/.pm2/logs/*-out.log",
+            "log_group_name": "/handson/pm2/out",
+            "log_stream_name": "{instance_id}",
+            "timestamp_format": "%Y-%m-%dT%H:%M:%S"
+          },
+          {
+            "file_path": "/root/.pm2/logs/*-error.log",
+            "log_group_name": "/handson/pm2/error",
+            "log_stream_name": "{instance_id}",
+            "timestamp_format": "%Y-%m-%dT%H:%M:%S"
+          }
+        ]
+      }
+    }
+  }
+}

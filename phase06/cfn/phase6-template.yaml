@@ -97,7 +97,7 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
-          Description: インターネットからのHTTPを許可
+          Description: Allow HTTP port 80 from internet
       Tags:
         - Key: Name
           Value: handson-alb-sg
@@ -112,7 +112,7 @@ Resources:
       FromPort: 3000
       ToPort: 3000
       SourceSecurityGroupId: !Ref AlbSecurityGroup
-      Description: ALBからEC2アプリポート3000への転送を許可
+      Description: Allow port 3000 from ALB to EC2 app
 
   # ----------------------------------------------------------
   # ターゲットグループ

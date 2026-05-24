@@ -16,4 +16,5 @@ AWS の主要サービスを段階的に学ぶためのハンズオン用アプ�
 | `phase04/` | + Lambda + SNS（レビュー投稿メール通知） |
 | `phase05/` | + Bedrock（AI分析・傾向可視化） |
 | `phase06/` | + ALB + Auto Scaling（高可用性構成）※アプリコード変更なし・インフラのみ |
-| `phase07/` | + CloudFront + S3（CDN化）※アプリコード変更なし・インフラのみ |
+| `phase07/` | + CloudFront + WAF（CDN化） + Route53（独自ドメイン化）※アプリコード変更なし・インフラのみ |
+| `phase08/` | + CloudWatch（監視）※アプリコード変更なし・インフラのみ |

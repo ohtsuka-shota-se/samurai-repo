@@ -34,7 +34,8 @@ Mappings:
       AmiId: ami-xxxxxxxxxxxxxxxxx            # ← 書き換え
 
       # EC2コンソール → キーペア → 使用しているキーペア名
-      KeyPairName: your-key-pair-name         # ← 書き換え
+      # ⚠️ .pem は不要。ファイル名が「ohtsuka-key.pem」なら「ohtsuka-key」と記入する
+      KeyPairName: your-key-pair-name         # ← 書き換え（.pem 拡張子なし）
 
 # ============================================================
 # リソース定義（以下は書き換え不要）

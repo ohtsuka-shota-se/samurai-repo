@@ -878,7 +878,7 @@ ALB は**無料枠がなく**、起動中は課金が続く。ハンズオン終
 | **EC2SecurityGroupId** | EC2コンソール → セキュリティグループ → `handson-sg` の「セキュリティグループ ID」 | `sg-0abc1234...` |
 | **InstanceProfileName** | 変更していなければ `handson-ec2-role` のまま | `handson-ec2-role` |
 | **AmiId** | EC2コンソール → AMI → `handson-app-ami` の「AMI ID」 | `ami-0abc1234...` |
-| **KeyPairName** | EC2コンソール → キーペア → 使用しているキーペア名 | `my-keypair` |
+| **KeyPairName** | EC2コンソール → キーペア → 使用しているキーペア名（**`.pem` 拡張子は除く**） | `my-keypair`（`my-keypair.pem` ではない） |
 
 > **AmiId は手順 [3]（AMI作成）の後に確認する。** 作成前にデプロイするとエラーになる。
 
@@ -932,7 +932,7 @@ Mappings:
       EC2SecurityGroupId: sg-xxxxxxxxxx    # ← ここを書き換え
       InstanceProfileName: handson-ec2-role  # 変更不要
       AmiId: ami-xxxxxxxxxxxxxxxxx         # ← AMI作成後に書き換え
-      KeyPairName: your-key-pair-name      # ← ここを書き換え
+      KeyPairName: your-key-pair-name      # ← ここを書き換え（.pem 拡張子は不要）
 ```
 
 各値の確認場所は「事前準備」の表を参照。

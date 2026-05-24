@@ -173,7 +173,7 @@ Resources:
       LaunchTemplateName: handson-lt
       LaunchTemplateData:
         ImageId: !Ref AmiId
-        InstanceType: t2.micro
+        InstanceType: t3.micro
         KeyName: !Ref KeyPairName
         SecurityGroupIds:
           - !Ref EC2SecurityGroupId

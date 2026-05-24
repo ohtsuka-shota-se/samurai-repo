@@ -6,6 +6,24 @@
 
 ---
 
+## 前提条件
+
+Phase 7 は Phase 6（ALB + Auto Scaling）の環境が動いていることが前提。
+以下をすべて満たしてからハンズオンを開始すること。
+
+| 前提条件 | 確認方法 |
+|---------|---------|
+| Phase 6 の CFn スタック（`handson-phase6`）がデプロイ済み、または手動構築済みであること | CloudFormation コンソール → `handson-phase6` のステータスが `CREATE_COMPLETE` |
+| ALB（`handson-alb`）が起動していること | EC2コンソール → ロードバランサー → `handson-alb` の状態が `active` |
+| ターゲットグループ（`handson-tg`）の EC2 が 2 台 `healthy` になっていること | EC2コンソール → ターゲットグループ → `handson-tg` → ターゲットタブ |
+| `http://[ALBのDNS名]` でアプリにアクセスできること | ブラウザで ALB の DNS 名を開いてログイン確認 |
+
+> **Phase 6 の環境を CFn で素早く再構築する場合:**
+> `phase06/cfn/phase6-template-fixed.yaml` の値を書き換えてデプロイすれば 5 分程度で整う。
+> 詳細は `docs/06_ALB_AutoScaling_ハンズオン手順.md` の「CloudFormation で環境を自動構築・削除する方法」を参照。
+
+---
+
 ## 完成後イメージ
 
 ```

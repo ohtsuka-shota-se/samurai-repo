@@ -738,6 +738,10 @@ http://[ALBのDNS名]
 ![](images/phase06-alb-check07.png)
 
 2台終了した時も2台自動で立ち上がってくることが確認できる。
+![](images/phase06-alb-check08.png)
+
+EC2を終了して、AutoScalingで立ち上がっていることはアクティビティからも追跡できる
+![](images/phase06-alb-check09.png)
 
 
 ---
@@ -828,7 +832,7 @@ ALB は**無料枠がなく**、起動中は課金が続く。ハンズオン終
 
 ```
 1. Auto Scaling グループを削除
-   → 「インスタンスを終了」を選択して削除（EC2も一緒に削除される）
+   → EC2側で「インスタンスを終了」も実行する
 2. ALB を削除
 3. ターゲットグループを削除
 4. Launch Template を削除

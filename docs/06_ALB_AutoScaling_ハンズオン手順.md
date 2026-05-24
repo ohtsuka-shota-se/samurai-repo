@@ -861,81 +861,126 @@ ALB は**無料枠がなく**、起動中は課金が続く。ハンズオン終
 ## CloudFormation で環境を自動構築・削除する方法
 
 上記 [1]〜[9] の手順は AWSコンソールで手動操作する方法だが、
-`cfn/` フォルダのテンプレートを使えばコマンド1つで全リソースを作成・削除できる。
+`cfn/` フォルダのテンプレートを使えば全リソースをまとめて作成・削除できる。
 ハンズオンを複数回に分けて行う場合に便利。
 
-### 前提
+---
 
-- AWS CLI がローカルにインストールされていること
-- `aws configure` で認証情報が設定済みであること
+### 事前準備：パラメータの確認
+
+デプロイ前に以下の値を手元にメモしておく。
+
+| パラメータ | 確認場所 | 例 |
+|-----------|---------|-----|
+| **VpcId** | VPCコンソール → VPC → `handson-vpc` の「VPC ID」 | `vpc-0abc1234...` |
+| **ExistingSubnet1aId** | VPCコンソール → サブネット → `handson-public-subnet-1a` の「サブネット ID」 | `subnet-0abc1234...` |
+| **RouteTableId** | VPCコンソール → ルートテーブル → `handson-public-subnet-1a` に関連付けられている RTB の「ルートテーブル ID」 | `rtb-0abc1234...` |
+| **EC2SecurityGroupId** | EC2コンソール → セキュリティグループ → `handson-sg` の「セキュリティグループ ID」 | `sg-0abc1234...` |
+| **InstanceProfileName** | 変更していなければ `handson-ec2-role` のまま | `handson-ec2-role` |
+| **AmiId** | EC2コンソール → AMI → `handson-app-ami` の「AMI ID」 | `ami-0abc1234...` |
+| **KeyPairName** | EC2コンソール → キーペア → 使用しているキーペア名 | `my-keypair` |
+
+> **AmiId は手順 [3]（AMI作成）の後に確認する。** 作成前にデプロイするとエラーになる。
+
+---
+
+### マネジメントコンソールから操作する場合
+
+#### スタックの作成
+
+**① CloudFormation を開く**
+
+1. AWSマネジメントコンソール → 検索バーで「CloudFormation」を開く
+2. リージョンが **東京（ap-northeast-1）** になっていることを確認
+3. 「スタックを作成」→ **「新しいリソースを使用（標準）」** をクリック
+
+**② テンプレートを指定する**
+
+4. 「テンプレートソース」→ **「テンプレートファイルのアップロード」** を選択
+5. 「ファイルを選択」→ `phase06/cfn/phase6-template.yaml` を選択してアップロード
+6. 「次へ」をクリック
+
+**③ スタック名とパラメータを入力する**
+
+7. スタック名: **`handson-phase6`** と入力
+8. 「事前準備」でメモした値を各パラメータ欄に入力する
+9. 「次へ」をクリック
+
+**④ オプション設定・確認**
+
+10. 「スタックオプションの設定」は何も変更せず「次へ」をクリック
+11. 入力内容を確認して **「送信」** をクリック
+
+**⑤ 完了確認**
+
+12. ステータスが `CREATE_IN_PROGRESS` → **`CREATE_COMPLETE`** になるまで待つ（3〜5分）
+13. スタックを選択して **「出力」タブ** を開く
+14. `AppUrl` の値をコピーしてブラウザで開き、アプリが表示されることを確認
+
+> デプロイ後、Auto Scalingグループの最小容量を `1` → `2` に変更することを推奨（CPU低負荷時にスケールインで1台に減らされるのを防ぐ）。
+> EC2コンソール → Auto Scalingグループ → `handson-asg` → 「編集」→ 最小の希望する容量を `2` に変更。
+
+#### スタックの削除（ハンズオン終了後）
+
+1. CloudFormationコンソール → 「スタック」一覧
+2. `handson-phase6` を選択
+3. **「削除」** ボタンをクリック
+4. 確認ダイアログで **「削除」** をクリック
+5. ステータスが **`DELETE_COMPLETE`** になれば完了（3〜5分）
+
+> **削除されるリソース:** ALB・ターゲットグループ・Auto Scalingグループ・EC2インスタンス・サブネット（handson-public-subnet-1c）
+> **削除されないリソース:** VPC・既存サブネット（1a）・セキュリティグループ・AMI・スナップショット
+> AMIとスナップショットは手動で削除すること（手順 [9] の 5・6 を参照）。
+
+---
+
+### AWS CLI から操作する場合
+
+**前提:** AWS CLI がインストール済みで `aws configure` の設定が完了していること。
 
 ```bash
 # インストール確認
 aws --version
 ```
 
-### 事前準備：パラメータファイルの編集
-
-`cfn/phase6-params.json` を開いて、各 `ParameterValue` に自分の環境の値を記入する。
-
-| パラメータ | 確認場所 |
-|-----------|---------|
-| VpcId | VPCコンソール → VPC → handson-vpc |
-| ExistingSubnet1aId | VPCコンソール → サブネット → handson-public-subnet-1a |
-| RouteTableId | VPCコンソール → ルートテーブル |
-| EC2SecurityGroupId | EC2コンソール → セキュリティグループ → handson-sg |
-| AmiId | EC2コンソール → AMI → handson-app-ami（手順 [3] の後に記入） |
-| KeyPairName | EC2コンソール → キーペア |
-
-> **AmiId は手順 [2]（PM2設定）→ [3]（AMI作成）の後に記入する。**
-> その他のパラメータは先に記入しておいてよい。
-
-### 構築コマンド（ハンズオン開始時に実行）
-
 ```bash
 # cfn/ フォルダに移動
-cd /path/to/samurai-repo/cfn
+cd /path/to/samurai-repo/phase06/cfn
 
-# スタックを作成（約5〜10分で完了）
+# スタックを作成
 aws cloudformation create-stack \
   --stack-name handson-phase6 \
   --template-body file://phase6-template.yaml \
   --parameters file://phase6-params.json \
   --region ap-northeast-1
 
-# 作成状況を確認（CREATE_COMPLETE になるまで待つ）
+# 作成完了を待つ（CREATE_COMPLETE になるまでブロック）
 aws cloudformation wait stack-create-complete \
   --stack-name handson-phase6 \
   --region ap-northeast-1
 
-# ALBのURLを出力で確認
+# ALBのURL（AppUrl）を確認
 aws cloudformation describe-stacks \
   --stack-name handson-phase6 \
   --region ap-northeast-1 \
   --query "Stacks[0].Outputs"
 ```
 
-### 削除コマンド（ハンズオン終了時に実行）
-
 ```bash
-# スタックを削除（ALB・ASG・サブネットなど全リソースをまとめて削除）
+# スタックを削除
 aws cloudformation delete-stack \
   --stack-name handson-phase6 \
   --region ap-northeast-1
 
-# 削除完了を確認
+# 削除完了を待つ
 aws cloudformation wait stack-delete-complete \
   --stack-name handson-phase6 \
   --region ap-northeast-1
 ```
 
-> **AMIとスナップショットはスタック削除対象外。**
-> 手動で登録解除・削除すること（[9] の手順 5・6 を参照）。
-
 ### 注意点
 
-- `phase6-params.json` の Comment フィールドは AWS CLI では無視されるが、JSON として有効なので問題ない
-- スタックの作成・削除状況は AWSコンソール → CloudFormation からも確認できる
-- エラーになった場合は CloudFormation コンソール → スタック → 「イベント」タブでエラー内容を確認できる
+- `phase6-params.json` の `Comment` フィールドは AWS CLI では無視されるが、JSON として有効なので問題ない
+- エラーになった場合は CloudFormationコンソール → スタック → **「イベント」タブ** でエラー内容を確認できる
 
 **ハンズオンで数時間使う程度であれば数十円〜数百円程度。** 必ず終了後に削除すること。

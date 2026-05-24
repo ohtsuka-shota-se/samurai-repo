@@ -10,8 +10,9 @@ AMI を作成してEC2環境を複製し、ALB でトラフィックを分散、
 ```
 phase06/
 └── cfn/
-    ├── phase6-template.yaml   # CloudFormation テンプレート（全リソース定義）
-    └── phase6-params.json     # パラメータ記入テンプレート（値を記入して使う）
+    ├── phase6-template.yaml        # CloudFormation テンプレート（パラメータ入力あり）
+    ├── phase6-template-fixed.yaml  # CloudFormation テンプレート（値ハードコード版・マネコン入力不要）
+    └── phase6-params.json          # CLIデプロイ用パラメータファイル
 ```
 
 Phase 6 はアプリのコード変更なし。Phase 5 のEC2環境をAMI化し、インフラ構成のみ変更する。

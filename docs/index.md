@@ -17,4 +17,4 @@ Phase 1 から順番に進めることで、EC2・S3・Cognito・DynamoDB・Lamb
 
 ## アーキテクチャ全体像
 
-![アーキテクチャ](images/architecture.png)
+![アーキテクチャ](images/phase05.png)

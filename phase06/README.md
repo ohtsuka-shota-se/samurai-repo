@@ -34,6 +34,47 @@ Phase 6 はアプリのコード変更なし。Phase 5 のEC2環境をAMI化し�
 
 ## CloudFormation で環境を自動構築する場合
 
+### マネジメントコンソールから操作する場合
+
+#### スタックの作成
+
+1. AWSマネジメントコンソール → 「CloudFormation」を開く
+2. 「スタックを作成」→「新しいリソースを使用（標準）」をクリック
+3. **テンプレートの指定**
+   - 「テンプレートファイルのアップロード」を選択
+   - 「ファイルを選択」→ `phase06/cfn/phase6-template.yaml` をアップロード
+   - 「次へ」
+4. **スタックの詳細を指定**
+   - スタック名: `handson-phase6`
+   - 以下のパラメータを入力する（`phase6-params.json` の値を参照）
+
+| パラメータ名 | 確認場所 |
+|------------|---------|
+| VpcId | VPCコンソール → VPC → `handson-vpc` の VPC ID |
+| ExistingSubnet1aId | VPCコンソール → サブネット → `handson-public-subnet-1a` のサブネット ID |
+| RouteTableId | VPCコンソール → ルートテーブル → `handson-public-subnet` に関連付けられている RTB の ID |
+| EC2SecurityGroupId | EC2コンソール → セキュリティグループ → `handson-sg` のセキュリティグループ ID |
+| InstanceProfileName | `handson-ec2-role`（変更していなければデフォルト値のままでOK） |
+| AmiId | EC2コンソール → AMI → `handson-app-ami` の AMI ID（AMI作成後に記入） |
+| KeyPairName | EC2コンソール → キーペア → 使用しているキーペア名 |
+
+5. 「次へ」→「次へ」→ 内容を確認して「送信」をクリック
+6. ステータスが `CREATE_COMPLETE` になれば完了
+
+#### スタックの削除（ハンズオン終了後）
+
+1. CloudFormation コンソール → 「スタック」一覧
+2. `handson-phase6` を選択
+3. 「削除」ボタンをクリック
+4. 確認ダイアログで「削除」をクリック
+5. ステータスが `DELETE_COMPLETE` になれば完了
+
+> 削除には数分かかる。ALB・Auto Scalingグループ・EC2インスタンスなどがすべて自動で削除される。
+
+---
+
+### AWS CLI から操作する場合
+
 ```bash
 # cfn/ フォルダで実行
 cd phase06/cfn

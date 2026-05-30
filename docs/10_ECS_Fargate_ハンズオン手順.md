@@ -10,9 +10,12 @@
 
 | 前提条件 | 確認方法 |
 |---------|---------|
-| Phase 06 の ALB が起動していること | EC2 コンソール → ロードバランサー → `handson-alb` が `active` |
 | Phase 09 の CodeCommit・CodePipeline が動作していること | CodePipeline コンソール → `handson-pipeline` が成功している |
 | `handson-ec2-role` が存在していること | IAM コンソール → ロール → `handson-ec2-role` を確認 |
+
+> ✅ **ALB・EC2 は起動していなくて構わない。**
+> 本手順は Fargate コンテナに直接アクセスする構成のため、ALB は不要。
+> 費用削減のため、使用しない場合は停止・削除したままで問題ない。
 
 ---
 
@@ -25,11 +28,9 @@ CodeCommit → CodePipeline
     ↓
 CodeBuild（Docker イメージをビルド → ECR に push → ECS サービス更新）
     ↓
-ECS/Fargate（コンテナが自動起動）
+ECS/Fargate（コンテナが自動起動・パブリック IP が割り当てられる）
     ↓
-ALB（handson-alb）→ ECS サービス（コンテナ）
-    ↓
-アプリに変更が反映される
+ブラウザから http://[FargateタスクのパブリックIP]:3000 でアクセス
 ```
 
 ---
@@ -39,17 +40,16 @@ ALB（handson-alb）→ ECS サービス（コンテナ）
 ```mermaid
 graph TB
     Dev["💻 ローカル（開発者）"]
+    User["👤 ユーザー（ブラウザ）"]
 
     subgraph AWS["AWS クラウド (ap-northeast-1)"]
         CC["📦 CodeCommit\nhandson-repo"]
         CP["🔁 CodePipeline\nhandson-ecs-pipeline"]
         CB["🔨 CodeBuild\nhandson-ecs-build"]
         ECR["🐳 ECR\nhandson-app"]
-        ALB["⚖️ ALB\nhandson-alb"]
 
         subgraph ECS["ECS クラスター: handson-cluster"]
-            SVC["ECS サービス\nhandson-service"]
-            T1["🟦 Fargate タスク\n（コンテナ）"]
+            T1["🟦 Fargate タスク\nパブリックIP:3000"]
         end
 
         DDB["🗄️ DynamoDB"]
@@ -61,9 +61,9 @@ graph TB
     CC --> CP
     CP --> CB
     CB -->|docker push| ECR
-    CB -->|ecs update-service| SVC
+    CB -->|ecs update-service| ECS
     ECR -->|イメージ取得| T1
-    ALB --> SVC
+    User -->|http://IP:3000| T1
     T1 --> DDB
     T1 --> S3
     T1 --> Cognito
@@ -84,15 +84,13 @@ graph TB
     ↓
 [5] タスク定義を作成する
     ↓
-[6] ALB にターゲットグループを追加する
+[6] ECS サービスを作成する
     ↓
-[7] ECS サービスを作成する
+[7] 動作確認
     ↓
-[8] 動作確認
+[8] CI/CD を ECS 向けに更新する
     ↓
-[9] CI/CD を ECS 向けに更新する
-    ↓
-[10] ハンズオン終了後のリソース削除
+[9] ハンズオン終了後のリソース削除
 ```
 
 ---
@@ -131,7 +129,7 @@ GitHub に対する Docker Hub のような位置づけ。
 ### ECS（Elastic Container Service）
 
 コンテナの起動・管理・スケーリングを行うサービス。
-「このイメージを何個起動して、ALB と紐付けて…」という設定を管理する。
+「このイメージを何個起動して…」という設定を管理する。
 
 ### Fargate
 
@@ -151,7 +149,7 @@ ECS でコンテナを起動するための設定書。
 ### ECS サービス
 
 タスク定義をもとに「常に N 個のコンテナを維持する」設定。
-コンテナが落ちたら自動で再起動し、ALB とも連携する。
+コンテナが落ちたら自動で再起動する。
 
 ### クラスター
 
@@ -206,7 +204,7 @@ CMD ["node", "dist/index.js"]
 
 ### 1-2. .dockerignore を作成する
 
-不要なファイルをイメージに含めないよう、`.dockerignore` を作成する。
+不要なファイルをイメージに含めないよう `.dockerignore` を作成する。
 
 `/mnt/c/Users/ohtsu/Documents/AWS/claudecode/.dockerignore`：
 
@@ -222,8 +220,6 @@ node_modules
 ---
 
 ## [2] ECR リポジトリを作成する
-
-### 2-1. リポジトリを作成する
 
 1. ECR コンソールを開く（リージョン：東京 ap-northeast-1）
 2. **「リポジトリを作成」** をクリック
@@ -253,24 +249,20 @@ ECS/Fargate では 2 種類の IAM ロールが必要になる。
 
 1. IAM コンソール → **「ロールを作成」**
 2. **信頼されたエンティティタイプ**：「AWS のサービス」
-3. **ユースケース**：「Elastic Container Service」→「Elastic Container Service Task」を選択 → **「次へ」**
-4. `AmazonECSTaskExecutionRolePolicy` が自動でアタッチされていることを確認 → **「次へ」**
+3. **ユースケース**：「Elastic Container Service」→「**Elastic Container Service Task**」を選択 → **「次へ」**
+4. `AmazonECSTaskExecutionRolePolicy` にチェック → **「次へ」**
 5. **ロール名**：`handson-ecs-task-execution-role` → **「ロールを作成」**
 
 ---
 
-### 3-2. タスクロールを確認する
+### 3-2. タスクロールの確認
 
 タスクロールは既存の `handson-ec2-role` を流用できる。
-EC2 にアタッチしていた DynamoDB・S3・Cognito・Bedrock 等の権限がそのまま使える。
-
-> 新規で作成する場合は `handson-ec2-role` にアタッチされているポリシーと同じものをアタッチしたロールを作成する。
+DynamoDB・S3・Cognito・Bedrock 等の権限がそのまま使える。
 
 ---
 
 ### 3-3. CodeBuild のロールに ECR・ECS 権限を追加する
-
-Phase 09 で作成した CodeBuild のロールに、ECR への push と ECS サービスの更新権限を追加する。
 
 1. IAM コンソール → **ロール** → `codebuild-handson-build-service-role` を開く
 2. **「許可を追加」** → **「ポリシーをアタッチ」**
@@ -322,7 +314,7 @@ Phase 09 で作成した CodeBuild のロールに、ECR への push と ECS サ
 | 項目 | 値 |
 |------|---|
 | コンテナ名 | `handson-app` |
-| イメージ URI | `[ECR の URI]/handson-app:latest`（[2-1] で控えた URI） |
+| イメージ URI | `[ECR の URI]/handson-app:latest`（[2] で控えた URI） |
 | コンテナポート | `3000` |
 | プロトコル | TCP |
 
@@ -338,13 +330,13 @@ Phase 09 で作成した CodeBuild のロールに、ECR への push と ECS サ
 |------|---|
 | `AWS_REGION` | `ap-northeast-1` |
 | `S3_BUCKET_NAME` | `handson-[名前]-files` |
-| `COGNITO_USER_POOL_ID` | `ap-northeast-1_xxxxxxxxx` |
-| `COGNITO_CLIENT_ID` | `xxxxxxxxxxxxxxxxxxxxxxxxxx` |
+| `COGNITO_USER_POOL_ID` | Cognito コンソールで確認 |
+| `COGNITO_CLIENT_ID` | Cognito コンソールで確認 |
 | `DYNAMODB_TABLE_NAME` | `handson-reviews` |
 | `BEDROCK_REGION` | `us-east-1` |
 | `PORT` | `3000` |
 
-> 値は EC2 上の `.env` ファイルの内容を参照する。
+> EC2 が起動している場合は以下で値を確認できる。
 > ```bash
 > cat /root/samurai-repo/phase05/backend/.env
 > ```
@@ -352,8 +344,6 @@ Phase 09 で作成した CodeBuild のロールに、ECR への push と ECS サ
 ---
 
 ### 5-3. ログの設定をする
-
-コンテナのログを CloudWatch Logs に送信する設定をする。
 
 **「ログ収集を使用」** にチェックが入っていることを確認（デフォルトで有効）。
 
@@ -366,43 +356,35 @@ Phase 09 で作成した CodeBuild のロールに、ECR への push と ECS サ
 
 ---
 
-## [6] ALB にターゲットグループを追加する
+## [6] ECS サービスを作成する
 
-Fargate はネットワークモードが `awsvpc` のため、既存の EC2 用ターゲットグループは使えない。
-ECS 専用のターゲットグループ（ターゲットタイプ：IP）を新規作成する。
+### 6-1. セキュリティグループを作成する
 
-### 6-1. ターゲットグループを作成する
+Fargate タスクへのアクセスを許可するセキュリティグループを作成する。
 
-1. EC2 コンソール → **「ターゲットグループ」** → **「ターゲットグループの作成」**
+1. EC2 コンソール → **「セキュリティグループ」** → **「セキュリティグループを作成」**
 2. 以下を設定：
 
 | 項目 | 値 |
 |------|---|
-| ターゲットタイプ | **IP アドレス**（EC2 インスタンスではない） |
-| ターゲットグループ名 | `handson-ecs-tg` |
-| プロトコル | HTTP |
-| ポート | `3000` |
+| セキュリティグループ名 | `handson-ecs-sg` |
+| 説明 | `ECS Fargate task SG` |
 | VPC | `handson-vpc` |
-| ヘルスチェックパス | `/` |
 
-3. **「次へ」** → ターゲットの登録はスキップ（ECS が自動で登録する）→ **「ターゲットグループの作成」**
+**インバウンドルール：**
 
----
+| タイプ | プロトコル | ポート | ソース |
+|--------|-----------|--------|--------|
+| カスタム TCP | TCP | 3000 | マイ IP |
 
-### 6-2. ALB のリスナーを更新する
+> **マイ IP** を選択すると、自分のグローバル IP のみアクセスを許可できる。
+> 学習目的で一時的に公開する場合のみ `0.0.0.0/0`（すべて）を選択する。
 
-既存の ALB（`handson-alb`）のポート 80 リスナーのデフォルトターゲットを ECS 用に切り替える。
-
-1. EC2 コンソール → **「ロードバランサー」** → `handson-alb` → **「リスナー」** タブ
-2. ポート 80 のリスナーを選択 → **「編集」**
-3. デフォルトアクション → **「転送先」** を `handson-ecs-tg` に変更
-4. **「変更を保存」**
+3. **「セキュリティグループを作成」**
 
 ---
 
-## [7] ECS サービスを作成する
-
-### 7-1. サービスを作成する
+### 6-2. サービスを作成する
 
 1. ECS コンソール → `handson-cluster` → **「サービスの作成」**
 2. 以下を設定：
@@ -428,39 +410,29 @@ ECS 専用のターゲットグループ（ターゲットタイプ：IP）を�
 | 項目 | 値 |
 |------|---|
 | VPC | `handson-vpc` |
-| サブネット | `handson-public-subnet-1a`・`handson-public-subnet-1c`（両方選択） |
-| セキュリティグループ | 新規作成（後述） |
-| パブリック IP | オン |
-
-**セキュリティグループの作成（新規作成を選択）：**
-
-| 項目 | 値 |
-|------|---|
-| セキュリティグループ名 | `handson-ecs-sg` |
-| インバウンドルール | TCP / ポート 3000 / ソース：`handson-alb-sg`（ALB のセキュリティグループ） |
+| サブネット | `handson-public-subnet-1a`（1つ選択） |
+| セキュリティグループ | `handson-ecs-sg`（既存を選択） |
+| パブリック IP | **オン**（これがないと外からアクセスできない） |
 
 **ロードバランシング：**
 
 | 項目 | 値 |
 |------|---|
-| ロードバランサーの種類 | Application Load Balancer |
-| ロードバランサー | `handson-alb` |
-| リスナー | 80:HTTP（既存） |
-| ターゲットグループ | `handson-ecs-tg` |
+| ロードバランサーの使用 | **なし** |
 
 3. **「作成」** をクリック
 
 ---
 
-## [8] 動作確認
+## [7] 動作確認
 
-### 8-1. ECS サービスの起動を確認する
+### 7-1. タスクのパブリック IP を確認する
 
-1. ECS コンソール → `handson-cluster` → `handson-service`
-2. **「タスク」** タブ → タスクのステータスが `RUNNING` になるまで待つ
+1. ECS コンソール → `handson-cluster` → `handson-service` → **「タスク」** タブ
+2. 起動しているタスクをクリック
+3. **「パブリック IP」** の値を控える（例：`54.xxx.xxx.xxx`）
 
-> ⏱️ 初回起動には 2〜3 分かかる。
-> ECR からイメージを取得しているため、最初は少し時間がかかる。
+> ⏱️ タスクが `RUNNING` になるまで 2〜3 分かかる。
 
 > **タスクが `STOPPED` になる場合:**
 > タスクを選択 → **「ログ」** タブでエラー内容を確認する。
@@ -468,22 +440,25 @@ ECS 専用のターゲットグループ（ターゲットタイプ：IP）を�
 
 ---
 
-### 8-2. ALB 経由でアプリにアクセスする
+### 7-2. ブラウザでアクセスする
 
-ブラウザで ALB の DNS 名または CloudFront の URL を開き、アプリが表示されることを確認する。
+```
+http://[パブリックIP]:3000
+```
 
 - [ ] トップページが表示される
 - [ ] ログインできる（Cognito 認証）
 - [ ] レビュー一覧が取得できる
 - [ ] S3 ファイル管理が動作する
 
+> ⚠️ **タスクを再起動するとパブリック IP が変わる。**
+> 毎回タスクタブで IP を確認すること。
+
 ---
 
-## [9] CI/CD を ECS 向けに更新する
+## [8] CI/CD を ECS 向けに更新する
 
-Phase 09 で作成した CI/CD パイプラインを ECS 向けに更新する。
-
-### 9-1. buildspec.yml を更新する
+### 8-1. buildspec.yml を書き換える
 
 `/mnt/c/Users/ohtsu/Documents/AWS/claudecode/buildspec.yml` を以下に書き換える：
 
@@ -522,7 +497,7 @@ phases:
 
 ---
 
-### 9-2. CodeBuild で Docker を使えるようにする
+### 8-2. CodeBuild で Docker を使えるようにする
 
 CodeBuild はデフォルトでは Docker が使えない設定になっている。
 
@@ -532,10 +507,10 @@ CodeBuild はデフォルトでは Docker が使えない設定になってい�
 
 ---
 
-### 9-3. CodePipeline からデプロイステージを外す
+### 8-3. CodePipeline からデプロイステージを削除する
 
 Phase 09 のパイプラインには CodeDeploy のデプロイステージがあるが、
-ECS 向けでは `buildspec.yml` 内で `aws ecs update-service` を実行するため不要になる。
+ECS 向けでは `buildspec.yml` 内で `aws ecs update-service` を実行するため不要。
 
 1. CodePipeline コンソール → `handson-pipeline` → **「編集」**
 2. **「Deploy」** ステージ → **「ステージを削除」**
@@ -543,9 +518,9 @@ ECS 向けでは `buildspec.yml` 内で `aws ecs update-service` を実行する
 
 ---
 
-### 9-4. 動作確認
+### 8-4. 動作確認
 
-コードを少し変更して CodeCommit に push する。
+コードを変更して CodeCommit に push する。
 
 ```bash
 cd /mnt/c/Users/ohtsu/Documents/AWS/claudecode
@@ -554,34 +529,29 @@ git commit -m "feat: ECS/Fargate 対応"
 git push codecommit main
 ```
 
-CodePipeline コンソールで以下の流れを確認する：
+CodePipeline コンソールで以下を確認する：
 
 | ステージ | 内容 |
 |---------|------|
 | Source | CodeCommit から取得 |
 | Build | Docker ビルド → ECR push → ECS サービス更新 |
 
-ECS コンソール → `handson-service` → **「タスク」** タブで新しいタスクが起動していることを確認する。
+ECS コンソール → `handson-service` → **「タスク」** タブで新しいタスクが起動したら、
+IP を確認してブラウザでアクセスする。
 
 ---
 
-## [10] ハンズオン終了後のリソース削除
-
-以下の順番で削除する。
+## [9] ハンズオン終了後のリソース削除
 
 | リソース | 削除場所 |
 |---------|---------|
-| ECS サービス | ECS → `handson-cluster` → `handson-service` → 削除（タスク数を 0 にしてから削除） |
+| ECS サービス | ECS → `handson-cluster` → `handson-service` → 削除 |
 | ECS クラスター | ECS → `handson-cluster` → 削除 |
 | タスク定義 | ECS → タスク定義 → `handson-task` → 登録解除 |
 | ECR リポジトリ | ECR → `handson-app` → 削除 |
-| ターゲットグループ | EC2 → ターゲットグループ → `handson-ecs-tg` → 削除 |
 | セキュリティグループ | EC2 → セキュリティグループ → `handson-ecs-sg` → 削除 |
 | IAM ロール | IAM → `handson-ecs-task-execution-role` → 削除 |
 | CloudWatch ロググループ | CloudWatch → `/ecs/handson-task` → 削除 |
-
-> ALB（`handson-alb`）のリスナーを元の EC2 ターゲットグループに戻す場合は、
-> リスナーの編集で `handson-tg` に切り替える。
 
 ---
 
@@ -589,8 +559,8 @@ ECS コンソール → `handson-service` → **「タスク」** タブで新�
 
 | リソース | 費用 | 備考 |
 |---------|------|------|
-| Fargate（0.5vCPU / 1GB） | 約 $0.025/時間 → **約 $18/月** | 起動中は課金される。ハンズオン後は削除すること |
+| Fargate（0.5vCPU / 1GB） | 約 $0.025/時間 → **約 $18/月** | 起動中は課金される。ハンズオン後は必ず削除すること |
 | ECR | $0.10/GB/月 | イメージサイズによるが数十円程度 |
-| ALB | 約 $0.008/時間 → **約 $6/月** | Phase 06 から継続利用 |
 
-> ⚠️ Fargate は EC2 と異なり停止という概念がない。使わないときはサービスを削除すること。
+> ⚠️ Fargate は EC2 と異なり「停止」という概念がない。
+> 使い終わったらサービスごと削除すること。

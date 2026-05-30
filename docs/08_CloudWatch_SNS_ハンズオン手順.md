@@ -21,6 +21,30 @@ SNS Topic（handson-alert-topic）
 
 ---
 
+## 環境イメージ
+
+```mermaid
+graph TB
+    EC2["🖥️ EC2（Ubuntu）\nPM2 + Node.js"]
+    CWA["📡 CloudWatch Agent\nEC2 上で動作"]
+    CWL_OUT["📋 CloudWatch Logs\n/handson/pm2/out"]
+    CWL_ERR["📋 CloudWatch Logs\n/handson/pm2/error"]
+    MF["🔍 Metric Filter\nhandson-pm2-error-filter\nERROR を検知"]
+    ALARM["🔔 CloudWatch Alarm\nhandson-pm2-error-alarm\n5分以内に1件以上でアラート"]
+    SNS["📨 SNS Topic\nhandson-alert-topic"]
+    EMAIL["📧 メール通知"]
+
+    EC2 -->|ログファイル出力| CWA
+    CWA -->|転送| CWL_OUT
+    CWA -->|転送| CWL_ERR
+    CWL_ERR --> MF
+    MF -->|カウント| ALARM
+    ALARM -->|ALARM 状態| SNS
+    SNS -->|メール送信| EMAIL
+```
+
+---
+
 ## 前提条件
 
 | 項目 | 確認内容 |

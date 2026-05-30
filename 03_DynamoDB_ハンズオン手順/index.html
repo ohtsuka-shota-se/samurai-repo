@@ -1,0 +1,2041 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="AWS の主要サービスを段階的に学ぶためのハンズオン手順書">
+      
+      
+      
+        <link rel="canonical" href="https://ohtsuka-shota-se.github.io/samurai-repo/03_DynamoDB_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="prev" href="../02_Cognito_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="next" href="../04_Lambda_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Phase 3 - DynamoDB - AWS 学習ハンズオン</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dynamodb-phase-3" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href=".." title="AWS 学習ハンズオン" class="md-header__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AWS 学習ハンズオン
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 3 - DynamoDB
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="タブ" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  ホーム
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  ハンズオン手順書
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  参考資料
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AWS 学習ハンズオン" class="md-nav__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AWS 学習ハンズオン
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ホーム
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ハンズオン手順書
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ハンズオン手順書
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 - EC2・S3・IAM・VPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_Cognito_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 - Cognito（認証）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 - DynamoDB
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 - DynamoDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ゴール
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DynamoDB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DynamoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#amazon-dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Amazon DynamoDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        テーブル
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        アイテム
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        パーティションキー（PK）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#putitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PutItem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GetItem
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        認証制御
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="認証制御">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        公開エンドポイントと保護エンドポイント
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コード用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="コード用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-sdk-for-dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS SDK for DynamoDB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS SDK for DynamoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-sdklib-dynamodbdocumentclient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        @aws-sdk/lib-dynamodb（DocumentClient）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#randomuuid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        randomUUID
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        仕組みの説明（学習者向け）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] DynamoDB テーブル作成
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-iam-dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] IAMロールに DynamoDB 権限を追加
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-env" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] バックエンドの .env 設定
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] EC2でアプリを更新・起動
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] ブラウザで動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[5] ブラウザで動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認チェックリスト
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        トラブルシューティング
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="トラブルシューティング">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        レビュー投稿で「レビューの投稿に失敗しました」が表示される
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        レビュー一覧が空で表示される
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ハンズオン終了時の注意
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_Lambda_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 - Lambda・SNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_Bedrock_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 5 - Bedrock（AI）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_ALB_AutoScaling_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 6 - ALB・Auto Scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07_CloudFront_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 7 - CloudFront（CDN）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08_CloudWatch_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 8 - CloudWatch・SNS（監視）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09_CodeCommit_CICD_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 9 - CodeCommit・CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10_ECS_Fargate_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 10 - ECS/Fargate（コンテナ化）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    参考資料
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    参考資料
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ローカル開発環境のセットアップ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E4%BF%AE%E6%AD%A3%E3%83%BB%E5%A4%89%E6%9B%B4%E5%B1%A5%E6%AD%B4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修正・変更履歴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GitHub%E7%AE%A1%E7%90%86%E6%96%B9%E9%87%9D%E3%81%A8push%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub管理方針
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ゴール
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DynamoDB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DynamoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#amazon-dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Amazon DynamoDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        テーブル
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        アイテム
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        属性
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        パーティションキー（PK）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#putitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PutItem
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GetItem
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        認証制御
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="認証制御">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        公開エンドポイントと保護エンドポイント
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コード用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="コード用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-sdk-for-dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS SDK for DynamoDB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS SDK for DynamoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-sdklib-dynamodbdocumentclient" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        @aws-sdk/lib-dynamodb（DocumentClient）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#randomuuid" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        randomUUID
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        仕組みの説明（学習者向け）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] DynamoDB テーブル作成
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-iam-dynamodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] IAMロールに DynamoDB 権限を追加
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-env" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] バックエンドの .env 設定
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] EC2でアプリを更新・起動
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] ブラウザで動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[5] ブラウザで動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認チェックリスト
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        トラブルシューティング
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="トラブルシューティング">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        レビュー投稿で「レビューの投稿に失敗しました」が表示される
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        レビュー一覧が空で表示される
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ハンズオン終了時の注意
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="dynamodb-phase-3">DynamoDB セットアップ手順（Phase 3 ハンズオン）<a class="headerlink" href="#dynamodb-phase-3" title="Permanent link">&para;</a></h1>
+<p>作成日: 2026-05-10
+更新日: 2026-05-10（環境イメージ・用語集・仕組みの説明を追加）</p>
+<p>対象: AWS未経験者向けハンズオン（3回目）</p>
+<hr />
+<h2 id="_1">完成後イメージ<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><img alt="" src="../images/phase03-%E5%AE%8C%E6%88%90%E5%BE%8C%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B801.png" />
+<img alt="" src="../images/phase03-%E5%AE%8C%E6%88%90%E5%BE%8C%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B802.png" /></p>
+<h2 id="_2">環境イメージ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TB
+    User["👤 ユーザー\n（ブラウザ）"]
+
+    subgraph AWS["AWS クラウド (ap-northeast-1)"]
+        Cognito["🔐 Amazon Cognito\nhandson-user-pool"]
+
+        subgraph VPC["VPC: handson-vpc (10.0.0.0/16)"]
+            subgraph Subnet["パブリックサブネット: handson-public-subnet"]
+                subgraph EC2Box["EC2インスタンス (Ubuntu 24.04 / t2.micro)"]
+                    FE["React フロントエンド\n(ビルド済み静的ファイル)"]
+                    BE["Node.js + Express バックエンド\n(ポート 3000)"]
+                    FE --&gt;|"画面操作 → APIリクエスト"| BE
+                end
+            end
+        end
+
+        IAM["IAMロール\nhandson-ec2-role\n(S3FullAccess + DynamoDBFullAccess)"]
+        S3["🪣 S3 バケット\nhandson-[名前]-files"]
+        DDB["🗄️ DynamoDB\nhandson-reviews"]
+
+        IAM -.-&gt;|アタッチ| EC2Box
+        BE --&gt;|"AWS SDK v3\nファイルの読み書き"| S3
+        BE --&gt;|"AWS SDK v3\nレビューの読み書き"| DDB
+        BE --&gt;|"JWKS で JWT 検証"| Cognito
+    end
+
+    User --&gt;|"① レビュー投稿\n（認証不要）"| EC2Box
+    User --&gt;|"② ログイン → JWT 取得"| Cognito
+    User --&gt;|"③ JWT付きでレビュー一覧・ファイル操作"| EC2Box</code></pre>
+<p><img alt="アーキテクチャ図" src="../images/phase03.png" /></p>
+<h2 id="_3">ゴール<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>ログイン不要でレビューを投稿でき、ログイン後にレビュー一覧・詳細が見られるアプリを動かす。</p>
+<h2 id="_4">全体の流れ<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[1] DynamoDB テーブル作成
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>[2] IAMロールに DynamoDB 権限を追加
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>[3] バックエンドの .env 設定
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>[4] EC2でアプリを更新・起動
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>[5] ブラウザで動作確認
+</code></pre></div>
+<hr />
+<h2 id="aws">AWS 用語集（手順を始める前に読んでおこう）<a class="headerlink" href="#aws" title="Permanent link">&para;</a></h2>
+<p>Phase 1・2 の用語集に加えて、Phase 3 で新たに登場する言葉を解説する。</p>
+<hr />
+<h3 id="dynamodb">DynamoDB<a class="headerlink" href="#dynamodb" title="Permanent link">&para;</a></h3>
+<h4 id="amazon-dynamodb">Amazon DynamoDB<a class="headerlink" href="#amazon-dynamodb" title="Permanent link">&para;</a></h4>
+<p>AWS が提供するフルマネージドの NoSQL データベース。
+サーバーの管理が不要で、データが自動的にスケールする。
+今回はレビューデータの保存・取得に使う。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>RDB（MySQLなど）との違い:
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  RDB:      テーブルに列の定義が必要。SQLで操作する
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  DynamoDB: 列の定義が不要。アイテムごとに異なる属性を持てる
+</code></pre></div>
+<p>無料枠: 25GB ストレージ・読み書き25ユニットまで<strong>永続無料</strong>（12ヶ月制限なし）。</p>
+<h4 id="_5">テーブル<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<p>DynamoDB でデータを入れる「箱」。RDB のテーブルに相当するが、スキーマ（列の定義）が不要。</p>
+<h4 id="_6">アイテム<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
+<p>テーブルに保存されるデータの1件。RDB の「行」に相当。</p>
+<h4 id="_7">属性<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
+<p>アイテムの中の各フィールド。RDB の「列」に相当するが、アイテムごとに異なる属性を持てる。</p>
+<h4 id="pk">パーティションキー（PK）<a class="headerlink" href="#pk" title="Permanent link">&para;</a></h4>
+<p>アイテムを一意に識別するキー。今回は <code>reviewId</code>（UUID）を使う。
+DynamoDB はこのキーをもとにデータを分散保存する。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>今回のテーブル設計:
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  reviewId（PK） │ rating │ comment │ userName │ createdAt
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  ───────────────┼────────┼─────────┼──────────┼──────────
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  abc-123...     │   4    │ 良かった │ 田中     │ 2026-05-10T...
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  def-456...     │   5    │ 最高！  │ ゲスト   │ 2026-05-10T...
+</code></pre></div>
+<h4 id="scan">Scan<a class="headerlink" href="#scan" title="Permanent link">&para;</a></h4>
+<p>テーブルの全アイテムを読み込む操作。
+データ量が多いと遅くなるが、学習用途では問題ない。
+今回のレビュー一覧取得に使う。</p>
+<h4 id="putitem">PutItem<a class="headerlink" href="#putitem" title="Permanent link">&para;</a></h4>
+<p>テーブルにアイテムを追加（または上書き）する操作。
+今回のレビュー投稿時に使う。</p>
+<h4 id="getitem">GetItem<a class="headerlink" href="#getitem" title="Permanent link">&para;</a></h4>
+<p>パーティションキーを指定してアイテムを1件取得する操作。
+今回のレビュー詳細表示時に使う。</p>
+<hr />
+<h3 id="_8">認証制御<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<h4 id="_9">公開エンドポイントと保護エンドポイント<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h4>
+<p>今回のアプリは API によって認証の要否を切り替えている。</p>
+<table>
+<thead>
+<tr>
+<th>エンドポイント</th>
+<th>認証</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST /api/reviews</code></td>
+<td>不要</td>
+<td>誰でもレビュー投稿できる</td>
+</tr>
+<tr>
+<td><code>GET /api/reviews</code></td>
+<td>必要（JWT）</td>
+<td>ログイン済みユーザーのみ閲覧できる</td>
+</tr>
+<tr>
+<td><code>GET /api/reviews/:id</code></td>
+<td>必要（JWT）</td>
+<td>同上</td>
+</tr>
+<tr>
+<td><code>GET/POST/DELETE /api/files</code></td>
+<td>必要（JWT）</td>
+<td>Phase 2 から継続</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_10">コード用語集（手順を始める前に読んでおこう）<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="aws-sdk-for-dynamodb">AWS SDK for DynamoDB<a class="headerlink" href="#aws-sdk-for-dynamodb" title="Permanent link">&para;</a></h3>
+<h4 id="aws-sdklib-dynamodbdocumentclient">@aws-sdk/lib-dynamodb（DocumentClient）<a class="headerlink" href="#aws-sdklib-dynamodbdocumentclient" title="Permanent link">&para;</a></h4>
+<p>DynamoDB を扱いやすくするラッパーライブラリ。
+通常の DynamoDB SDK はデータ型を <code>{ S: "文字列" }</code> や <code>{ N: "42" }</code> のように明示する必要があるが、
+DocumentClient を使うと JavaScript のオブジェクトをそのまま読み書きできる。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// DocumentClient なし（冗長）</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="p">{</span><span class="w"> </span><span class="nx">reviewId</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">S</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;abc-123&quot;</span><span class="w"> </span><span class="p">},</span><span class="w"> </span><span class="nx">rating</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">N</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;4&quot;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">}</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">// DocumentClient あり（シンプル）</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">{</span><span class="w"> </span><span class="nx">reviewId</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;abc-123&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">rating</span><span class="o">:</span><span class="w"> </span><span class="kt">4</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+<h4 id="randomuuid">randomUUID<a class="headerlink" href="#randomuuid" title="Permanent link">&para;</a></h4>
+<p>Node.js 組み込みの関数で、UUID（世界でほぼ一意の文字列）を生成する。
+外部ライブラリ不要で使える。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">randomUUID</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;crypto&#39;</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nx">randomUUID</span><span class="p">()</span><span class="w"> </span><span class="c1">// → &quot;550e8400-e29b-41d4-a716-446655440000&quot;</span>
+</code></pre></div>
+<p>レビューの <code>reviewId</code> はこれで生成する。</p>
+<hr />
+<h2 id="_11">仕組みの説明（学習者向け）<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    participant B as ブラウザ
+    participant E as EC2バックエンド
+    participant C as Cognito
+    participant D as DynamoDB
+
+    Note over B,D: ① レビュー投稿（認証不要）
+    B-&gt;&gt;E: POST /api/reviews&lt;br/&gt;{ rating: 4, comment: "良かった" }
+    E-&gt;&gt;D: PutItem（reviewId を生成して保存）
+    D--&gt;&gt;E: 保存成功
+    E--&gt;&gt;B: 201 { reviewId: "abc-123" }
+
+    Note over B,D: ② レビュー一覧取得（認証必要）
+    B-&gt;&gt;C: email + password でログイン
+    C--&gt;&gt;B: JWT（idToken）を発行
+    B-&gt;&gt;E: GET /api/reviews&lt;br/&gt;Authorization: Bearer [JWT]
+    E-&gt;&gt;C: JWKS で公開鍵を取得・JWT を検証
+    E-&gt;&gt;D: Scan（全アイテムを取得）
+    D--&gt;&gt;E: レビュー一覧
+    E--&gt;&gt;B: レビュー一覧を返す</code></pre>
+<p><strong>ポイント:</strong>
+- レビュー投稿は JWT なしで EC2 → DynamoDB に直接書き込む
+- レビュー一覧はバックエンドが JWT を検証してから DynamoDB に問い合わせる
+- EC2 は IAMロールの権限で DynamoDB にアクセスする（アクセスキー不要）</p>
+<hr />
+<h2 id="1-dynamodb">[1] DynamoDB テーブル作成<a class="headerlink" href="#1-dynamodb" title="Permanent link">&para;</a></h2>
+<ol>
+<li>AWSマネジメントコンソール → 「DynamoDB」を開く</li>
+<li>「テーブルを作成」をクリック</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>テーブル名</td>
+<td><code>handson-reviews</code></td>
+</tr>
+<tr>
+<td>パーティションキー</td>
+<td><code>reviewId</code>（型: 文字列）</td>
+</tr>
+<tr>
+<td>ソートキー</td>
+<td>設定しない</td>
+</tr>
+<tr>
+<td>テーブル設定</td>
+<td><strong>デフォルト設定</strong> のまま</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「テーブルを作成」をクリック</li>
+<li>ステータスが「アクティブ」になるまで待つ（1〜2分）</li>
+</ol>
+<hr />
+<h2 id="2-iam-dynamodb">[2] IAMロールに DynamoDB 権限を追加<a class="headerlink" href="#2-iam-dynamodb" title="Permanent link">&para;</a></h2>
+<p>Phase 1 で作成した <code>handson-ec2-role</code> に DynamoDB へのアクセス権限を追加する。</p>
+<ol>
+<li>AWSマネジメントコンソール → 「IAM」を開く</li>
+<li>左メニュー「ロール」→ <code>handson-ec2-role</code> をクリック</li>
+<li>「許可を追加」→「ポリシーをアタッチ」</li>
+<li>検索欄に <code>AmazonDynamoDBFullAccess_v2</code> と入力</li>
+<li><code>AmazonDynamoDBFullAccess_v2</code> にチェックを入れて「許可を追加」</li>
+</ol>
+<blockquote>
+<p><strong>本番環境では最小権限にすること</strong>
+ハンズオンでは学習のため FullAccess を使うが、本番では
+特定のテーブルへの読み書きのみに絞ったカスタムポリシーを使う。</p>
+</blockquote>
+<hr />
+<h2 id="3-env">[3] バックエンドの .env 設定<a class="headerlink" href="#3-env" title="Permanent link">&para;</a></h2>
+<p><strong>まず EC2 に SSH 接続し、root に切り替えて最新コードを取得する:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>su<span class="w"> </span>-
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>git<span class="w"> </span>pull
+</code></pre></div>
+<p><code>phase03/</code> フォルダが表示されれば取得成功。</p>
+<p><strong>実行場所: <code>~/samurai-repo/phase03/backend</code></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo/phase03/backend
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>nano<span class="w"> </span>.env
+</code></pre></div>
+<p>以下のように書き換える（Cognito の値は Phase 2 と同じ）:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>S3_BUCKET_NAME=handson-yamada-files
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>COGNITO_USER_POOL_ID=ap-northeast-1_xxxxxxxx
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>DYNAMODB_TABLE_NAME=handson-reviews
+</code></pre></div>
+<p>保存して終了: <code>Ctrl + O</code> → <code>Enter</code> → <code>Ctrl + X</code></p>
+<p>フロントエンドの .env も設定する:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo/phase03/frontend
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>nano<span class="w"> </span>.env
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>VITE_COGNITO_USER_POOL_ID=ap-northeast-1_xxxxxxxx
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>VITE_COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx
+</code></pre></div>
+<p>保存して終了: <code>Ctrl + O</code> → <code>Enter</code> → <code>Ctrl + X</code></p>
+<hr />
+<h2 id="4-ec2">[4] EC2でアプリを更新・起動<a class="headerlink" href="#4-ec2" title="Permanent link">&para;</a></h2>
+<p><strong>実行場所: <code>~/samurai-repo</code></strong>（[3] の続き。すでに root かつ git pull 済みの前提）</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># フロントエンドをビルド</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nb">cd</span><span class="w"> </span>phase03/frontend
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>npm<span class="w"> </span>install
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="c1"># バックエンドをセットアップ・起動</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="nb">cd</span><span class="w"> </span>../backend
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>npm<span class="w"> </span>install
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>npm<span class="w"> </span>start
+</code></pre></div>
+<p>以下のように表示されれば起動成功:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>サーバー起動: http://localhost:3000
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>S3バケット: handson-yamada-files
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>DynamoDBテーブル: handson-reviews
+</code></pre></div>
+<hr />
+<h2 id="5">[5] ブラウザで動作確認<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<p>ブラウザで以下にアクセス:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>http://[EC2のパブリックIP]:3000
+</code></pre></div>
+<h3 id="_12">動作確認チェックリスト<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h3>
+<p><strong>ログイン前（公開）:</strong>
+- [ ] 画面上部にナビゲーションバーが表示される
+- [ ] 「レビュー投稿」「レビュー一覧🔒」「ファイル管理🔒」のタブが見える
+- [ ] レビュー投稿フォームが表示される
+- [ ] 名前を入力しなくても投稿できる（「ゲスト」として登録される）
+- [ ] 星（1〜5）を選択してコメントを入力し「投稿する」を押すと成功メッセージが出る
+- [ ] DynamoDB コンソールで <code>handson-reviews</code> テーブルにデータが追加されている
+- [ ] 「レビュー一覧🔒」をクリックするとログイン画面に遷移する
+- [ ] 「← レビュー投稿に戻る」ボタンで戻れる</p>
+<p><strong>ログイン後（保護）:</strong>
+- [ ] ログイン後にヘッダーにメールアドレスが表示される
+- [ ] 「レビュー一覧」に遷移できる
+- [ ] 投稿したレビューが一覧に表示される
+- [ ] レビューをクリックすると詳細が表示される
+- [ ] 「← 一覧に戻る」ボタンで戻れる
+- [ ] 「ファイル管理」に遷移して Phase 2 と同様に操作できる</p>
+<hr />
+<h2 id="_13">トラブルシューティング<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h2>
+<h3 id="_14">レビュー投稿で「レビューの投稿に失敗しました」が表示される<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h3>
+<p>バックエンドのターミナルに <code>[DynamoDB PutItem Error]</code> が出ている場合、原因として多いのは:</p>
+<ol>
+<li><code>.env</code> の <code>DYNAMODB_TABLE_NAME</code> が間違っている</li>
+<li>IAMロールに DynamoDB 権限が付いていない</li>
+</ol>
+<p>IAMロールの確認:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">&quot;http://169.254.169.254/latest/api/token&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-aws-ec2-metadata-token-ttl-seconds: 21600&quot;</span><span class="k">)</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>curl<span class="w"> </span>-s<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-aws-ec2-metadata-token: </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span>http://169.254.169.254/latest/meta-data/iam/info
+</code></pre></div>
+<p><code>"Code" : "Success"</code> が返り、ロール名が表示されれば IAMロールは認識されている。
+その場合は IAM コンソールで <code>AmazonDynamoDBFullAccess_v2</code> がアタッチされているか確認する。</p>
+<hr />
+<h3 id="_15">レビュー一覧が空で表示される<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h3>
+<ul>
+<li>DynamoDB コンソールで <code>handson-reviews</code> テーブルを開き「アイテムを探索」でデータが入っているか確認</li>
+<li>データがある場合は認証トークンの問題 → ログアウトして再ログイン</li>
+</ul>
+<hr />
+<h2 id="_16">ハンズオン終了時の注意<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h2>
+<p>EC2を停止する手順は Phase 1 と同じ。
+DynamoDB は停止不要（無料枠：25GB・読み書き25ユニットまで永続無料）。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  ページトップへ戻る
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

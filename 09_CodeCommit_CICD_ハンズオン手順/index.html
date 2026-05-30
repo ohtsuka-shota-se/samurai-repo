@@ -1,0 +1,2931 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="AWS の主要サービスを段階的に学ぶためのハンズオン手順書">
+      
+      
+      
+        <link rel="canonical" href="https://ohtsuka-shota-se.github.io/samurai-repo/09_CodeCommit_CICD_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="prev" href="../08_CloudWatch_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="next" href="../10_ECS_Fargate_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Phase 9 - CodeCommit・CI/CD - AWS 学習ハンズオン</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-09-codecommit-codepipeline-codebuild-codedeploy" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href=".." title="AWS 学習ハンズオン" class="md-header__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AWS 学習ハンズオン
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 9 - CodeCommit・CI/CD
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="タブ" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  ホーム
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  ハンズオン手順書
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  参考資料
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AWS 学習ハンズオン" class="md-nav__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AWS 学習ハンズオン
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ホーム
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ハンズオン手順書
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ハンズオン手順書
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 - EC2・S3・IAM・VPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_Cognito_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 - Cognito（認証）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03_DynamoDB_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 - DynamoDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_Lambda_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 - Lambda・SNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_Bedrock_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 5 - Bedrock（AI）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_ALB_AutoScaling_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 6 - ALB・Auto Scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07_CloudFront_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 7 - CloudFront（CDN）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08_CloudWatch_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 8 - CloudWatch・SNS（監視）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 9 - CodeCommit・CI/CD
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 9 - CodeCommit・CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#codecommit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CodeCommit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CodeDeploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codebuild" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CodeBuild
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codepipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CodePipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#appspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        appspec.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        buildspec.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        アーティファクト
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        デプロイグループ
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] IAM の準備
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1] IAM の準備">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-codecommit-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. CodeCommit 接続用の IAM 認証情報を発行する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-ec2-iam-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. EC2 の IAM ロールに CodeDeploy 用権限を追加する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-3. CodeDeploy サービスロールを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-codecommit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] CodeCommit リポジトリを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[2] CodeCommit リポジトリを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-1. リポジトリを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-2-git-remote-codecommit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-2. ローカルの git remote を CodeCommit に向ける
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-3-codecommit-push" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-3. コードを CodeCommit に push する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ec2-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] EC2 に CodeDeploy エージェントを導入する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[3] EC2 に CodeDeploy エージェントを導入する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1-ec2-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-1. EC2 に SSH 接続する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-2. CodeDeploy エージェントをインストールする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-3. 動作確認と自動起動設定
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-appspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] appspec.yml とデプロイスクリプトを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[4] appspec.yml とデプロイスクリプトを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4-1-appspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-1. appspec.yml を作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-2. デプロイ用スクリプトを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-buildspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] buildspec.yml を作成する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [6] CodeDeploy を設定する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[6] CodeDeploy を設定する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-1. アプリケーションを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-2. デプロイグループを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-codebuild" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [7] CodeBuild プロジェクトを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[7] CodeBuild プロジェクトを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-1. ビルドプロジェクトを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-codepipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [8] CodePipeline でパイプラインを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[8] CodePipeline でパイプラインを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-1. パイプラインを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-2. ソースステージを設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-3. ビルドステージを設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-4. デプロイステージを設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [9] 動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[9] 動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-1. パイプラインの初回実行を確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-2-push" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-2. コードを変更して push する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-3. パイプラインが自動で動くことを確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-4-ec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-4. EC2 に変更が反映されることを確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [10] ハンズオン終了後のリソース削除
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コスト目安
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10_ECS_Fargate_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 10 - ECS/Fargate（コンテナ化）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    参考資料
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    参考資料
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ローカル開発環境のセットアップ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E4%BF%AE%E6%AD%A3%E3%83%BB%E5%A4%89%E6%9B%B4%E5%B1%A5%E6%AD%B4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修正・変更履歴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GitHub%E7%AE%A1%E7%90%86%E6%96%B9%E9%87%9D%E3%81%A8push%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub管理方針
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#codecommit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CodeCommit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CodeDeploy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codebuild" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CodeBuild
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#codepipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CodePipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#appspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        appspec.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buildspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        buildspec.yml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        アーティファクト
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        デプロイグループ
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] IAM の準備
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1] IAM の準備">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-codecommit-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. CodeCommit 接続用の IAM 認証情報を発行する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-ec2-iam-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. EC2 の IAM ロールに CodeDeploy 用権限を追加する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-3. CodeDeploy サービスロールを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-codecommit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] CodeCommit リポジトリを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[2] CodeCommit リポジトリを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-1. リポジトリを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-2-git-remote-codecommit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-2. ローカルの git remote を CodeCommit に向ける
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-3-codecommit-push" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-3. コードを CodeCommit に push する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ec2-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] EC2 に CodeDeploy エージェントを導入する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[3] EC2 に CodeDeploy エージェントを導入する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1-ec2-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-1. EC2 に SSH 接続する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-2. CodeDeploy エージェントをインストールする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-3. 動作確認と自動起動設定
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-appspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] appspec.yml とデプロイスクリプトを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[4] appspec.yml とデプロイスクリプトを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4-1-appspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-1. appspec.yml を作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-2. デプロイ用スクリプトを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-buildspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] buildspec.yml を作成する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-codedeploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [6] CodeDeploy を設定する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[6] CodeDeploy を設定する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-1. アプリケーションを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-2. デプロイグループを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-codebuild" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [7] CodeBuild プロジェクトを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[7] CodeBuild プロジェクトを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-1. ビルドプロジェクトを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-codepipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [8] CodePipeline でパイプラインを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[8] CodePipeline でパイプラインを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-1. パイプラインを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-2. ソースステージを設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-3. ビルドステージを設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-4. デプロイステージを設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [9] 動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[9] 動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-1. パイプラインの初回実行を確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-2-push" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-2. コードを変更して push する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-3. パイプラインが自動で動くことを確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-4-ec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9-4. EC2 に変更が反映されることを確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [10] ハンズオン終了後のリソース削除
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コスト目安
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="phase-09-codecommit-codepipeline-codebuild-codedeploy">Phase 09: CodeCommit + CodePipeline + CodeBuild + CodeDeploy ハンズオン手順<a class="headerlink" href="#phase-09-codecommit-codepipeline-codebuild-codedeploy" title="Permanent link">&para;</a></h1>
+<p>作成日: 2026-05-30</p>
+<p>対象: AWS未経験者向けハンズオン（9回目）</p>
+<hr />
+<h2 id="_1">前提条件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>前提条件</th>
+<th>確認方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EC2 が起動していること</td>
+<td>EC2 コンソールで <code>running</code> を確認</td>
+</tr>
+<tr>
+<td>PM2 でアプリが動いていること</td>
+<td>EC2 に SSH して <code>pm2 list</code> で <code>online</code> を確認</td>
+</tr>
+<tr>
+<td><code>handson-ec2-role</code> が EC2 にアタッチされていること</td>
+<td>EC2 詳細 → IAM ロール欄を確認</td>
+</tr>
+<tr>
+<td>IAM ユーザーが作成済みであること</td>
+<td>IAM コンソールでユーザーを確認</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_2">完成後イメージ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ローカルで git push
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>CodeCommit（ソースリポジトリ）
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>CodePipeline（push を自動検知してパイプラインを起動）
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>CodeBuild（npm install + TypeScript ビルド + Vite ビルド → S3 に保存）
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>CodeDeploy（S3 からアーティファクトを取得 → EC2 に展開 → PM2 再起動）
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>アプリに変更が反映される
+</code></pre></div>
+<hr />
+<h2 id="_3">環境イメージ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TB
+    Dev["💻 ローカル（開発者）"]
+    User["👤 ユーザー（ブラウザ）"]
+
+    subgraph CICD["CI/CD（Phase 09 で追加）"]
+        CC["📦 CodeCommit\nhandson-repo"]
+        CP["🔁 CodePipeline\nhandson-pipeline"]
+        CB["🔨 CodeBuild\nhandson-build"]
+        S3A["🪣 S3\nアーティファクト"]
+        CD["🚀 CodeDeploy\nhandson-app"]
+    end
+
+    subgraph Virginia["us-east-1（バージニア）"]
+        CF["🌐 CloudFront\nhandson-cloudfront"]
+    end
+
+    subgraph Tokyo["ap-northeast-1（東京）"]
+        Cognito["🔐 Cognito\nhandson-user-pool"]
+
+        subgraph VPC["VPC: handson-vpc"]
+            ALB["⚖️ ALB: handson-alb"]
+            subgraph SubnetA["subnet-1a"]
+                EC2A["🖥️ EC2\nPM2 + Node.js\n📡 CloudWatch Agent"]
+            end
+            subgraph SubnetC["subnet-1c"]
+                EC2C["🖥️ EC2\nPM2 + Node.js\n📡 CloudWatch Agent"]
+            end
+            ALB --&gt; EC2A
+            ALB --&gt; EC2C
+        end
+
+        S3["🪣 S3\nhandson-[名前]-files"]
+        DDB["🗄️ DynamoDB\nhandson-reviews"]
+        CWL["📋 CloudWatch Logs\n/handson/pm2/error"]
+    end
+
+    Dev --&gt;|git push| CC
+    CC --&gt;|変更を検知| CP
+    CP --&gt; CB
+    CB --&gt;|ビルド済み成果物| S3A
+    S3A --&gt; CD
+    CD --&gt;|自動デプロイ| EC2A
+    CD --&gt;|自動デプロイ| EC2C
+
+    User --&gt;|HTTPS| CF
+    CF --&gt;|HTTP| ALB
+    EC2A --&gt; S3
+    EC2A --&gt; DDB
+    EC2A --&gt;|JWT検証| Cognito
+    EC2A --&gt;|ログ転送| CWL
+    EC2C --&gt;|ログ転送| CWL</code></pre>
+<hr />
+<h2 id="_4">全体の流れ<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[1] IAM の準備
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    ↓
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>[2] CodeCommit リポジトリを作成する
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ↓
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>[3] EC2 に CodeDeploy エージェントを導入する
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    ↓
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>[4] appspec.yml とデプロイスクリプトを作成する
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    ↓
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>[5] buildspec.yml を作成する
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    ↓
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>[6] CodeDeploy を設定する
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    ↓
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>[7] CodeBuild プロジェクトを作成する
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    ↓
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>[8] CodePipeline でパイプラインを作成する
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    ↓
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>[9] 動作確認
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    ↓
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>[10] ハンズオン終了後のリソース削除
+</code></pre></div>
+<hr />
+<h2 id="aws">AWS 用語集<a class="headerlink" href="#aws" title="Permanent link">&para;</a></h2>
+<h3 id="codecommit">CodeCommit<a class="headerlink" href="#codecommit" title="Permanent link">&para;</a></h3>
+<p>AWS が提供する Git リポジトリサービス。GitHub の AWS 版のようなもの。
+コードを AWS 上で管理できる。</p>
+<h3 id="codedeploy">CodeDeploy<a class="headerlink" href="#codedeploy" title="Permanent link">&para;</a></h3>
+<p>EC2 などへのデプロイを自動化するサービス。
+<code>appspec.yml</code> というファイルで「どのファイルをどこに置き、何を実行するか」を定義する。</p>
+<h3 id="codebuild">CodeBuild<a class="headerlink" href="#codebuild" title="Permanent link">&para;</a></h3>
+<p>ソースコードのビルドを自動化するサービス。
+<code>buildspec.yml</code> で「何をインストールして、何をビルドするか」を定義する。</p>
+<h3 id="codepipeline">CodePipeline<a class="headerlink" href="#codepipeline" title="Permanent link">&para;</a></h3>
+<p>ソース取得 → ビルド → デプロイの一連の流れを自動化するサービス。
+CodeCommit・CodeBuild・CodeDeploy をつなぎ合わせる役割を担う。</p>
+<h3 id="appspecyml">appspec.yml<a class="headerlink" href="#appspecyml" title="Permanent link">&para;</a></h3>
+<p>CodeDeploy の設定ファイル。リポジトリのルートに置く。
+「どのファイルをどこにコピーするか」と「デプロイの各段階でどのスクリプトを実行するか」を定義する。</p>
+<h3 id="buildspecyml">buildspec.yml<a class="headerlink" href="#buildspecyml" title="Permanent link">&para;</a></h3>
+<p>CodeBuild の設定ファイル。リポジトリのルートに置く。
+「何をインストールして、何をビルドして、何を成果物として保存するか」を定義する。</p>
+<h3 id="_5">アーティファクト<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>ビルドの成果物のこと。
+CodeBuild がビルドした結果を S3 に保存し、CodeDeploy がそれを取得して EC2 にコピーする。</p>
+<h3 id="_6">デプロイグループ<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>CodeDeploy でデプロイ対象の EC2 を指定する設定。
+EC2 の Name タグを使って対象インスタンスを絞り込む。</p>
+<hr />
+<h2 id="1-iam">[1] IAM の準備<a class="headerlink" href="#1-iam" title="Permanent link">&para;</a></h2>
+<h3 id="1-1-codecommit-iam">1-1. CodeCommit 接続用の IAM 認証情報を発行する<a class="headerlink" href="#1-1-codecommit-iam" title="Permanent link">&para;</a></h3>
+<p>CodeCommit に HTTPS で push するための認証情報を発行する。</p>
+<ol>
+<li>IAM コンソール → <strong>ユーザー</strong> → 自分の IAM ユーザーを選択</li>
+<li><strong>セキュリティ認証情報</strong> タブ → 下にスクロール</li>
+<li><strong>「AWS CodeCommit の HTTPS Git 認証情報」</strong> → <strong>「認証情報を生成」</strong> をクリック</li>
+<li>表示された <strong>ユーザー名</strong> と <strong>パスワード</strong> を控える</li>
+</ol>
+<blockquote>
+<p>⚠️ この画面を閉じると二度とパスワードを確認できない。必ずメモしておくこと。</p>
+</blockquote>
+<hr />
+<h3 id="1-2-ec2-iam-codedeploy">1-2. EC2 の IAM ロールに CodeDeploy 用権限を追加する<a class="headerlink" href="#1-2-ec2-iam-codedeploy" title="Permanent link">&para;</a></h3>
+<p>EC2 が CodeDeploy からデプロイを受け入れられるよう、IAM ロールにポリシーを追加する。</p>
+<ol>
+<li>IAM コンソール → <strong>ロール</strong> → <code>handson-ec2-role</code> を開く</li>
+<li><strong>「許可を追加」</strong> → <strong>「ポリシーをアタッチ」</strong> をクリック</li>
+<li>以下の 2 つを検索してチェック → <strong>「許可を追加」</strong>：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>ポリシー名</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AmazonEC2RoleforAWSCodeDeploy</code></td>
+<td>CodeDeploy エージェントが S3 からアーティファクトを取得する権限</td>
+</tr>
+<tr>
+<td><code>AmazonS3ReadOnlyAccess</code></td>
+<td>CodeBuild のアーティファクト（S3）を読み取る権限</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="1-3-codedeploy">1-3. CodeDeploy サービスロールを作成する<a class="headerlink" href="#1-3-codedeploy" title="Permanent link">&para;</a></h3>
+<p>CodeDeploy が EC2 を操作するためのロールを作成する。</p>
+<ol>
+<li>IAM コンソール → <strong>ロール</strong> → <strong>「ロールを作成」</strong> をクリック</li>
+<li><strong>信頼されたエンティティタイプ</strong>：「AWS のサービス」を選択</li>
+<li><strong>ユースケース</strong>：「CodeDeploy」を選択 → <strong>「次へ」</strong></li>
+<li><code>AWSCodeDeployRole</code> が自動でアタッチされていることを確認 → <strong>「次へ」</strong></li>
+<li><strong>ロール名</strong>：<code>handson-codedeploy-role</code> → <strong>「ロールを作成」</strong></li>
+</ol>
+<hr />
+<h2 id="2-codecommit">[2] CodeCommit リポジトリを作成する<a class="headerlink" href="#2-codecommit" title="Permanent link">&para;</a></h2>
+<h3 id="2-1">2-1. リポジトリを作成する<a class="headerlink" href="#2-1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>CodeCommit コンソールを開く（リージョン：東京 ap-northeast-1）</li>
+<li><strong>「リポジトリを作成」</strong> をクリック</li>
+<li>以下を入力：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>リポジトリ名</td>
+<td><code>handson-repo</code></td>
+</tr>
+<tr>
+<td>説明（任意）</td>
+<td><code>handson CI/CD リポジトリ</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>「作成」</strong> をクリック</li>
+<li>表示された <strong>HTTPS URL</strong> を控える
+   （例：<code>https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/handson-repo</code>）</li>
+</ol>
+<hr />
+<h3 id="2-2-git-remote-codecommit">2-2. ローカルの git remote を CodeCommit に向ける<a class="headerlink" href="#2-2-git-remote-codecommit" title="Permanent link">&para;</a></h3>
+<p>WSL のターミナルで以下を実行する。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>/mnt/c/Users/ohtsu/Documents/AWS/claudecode
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="c1"># 現在のリモートを確認</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>git<span class="w"> </span>remote<span class="w"> </span>-v
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># CodeCommit をリモートとして追加（origin の GitHub は残したまま）</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>git<span class="w"> </span>remote<span class="w"> </span>add<span class="w"> </span>codecommit<span class="w"> </span>https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/handson-repo
+</code></pre></div>
+<blockquote>
+<p><code>origin</code>（GitHub）はそのまま残す。<code>codecommit</code> という別名で追加するだけ。</p>
+</blockquote>
+<hr />
+<h3 id="2-3-codecommit-push">2-3. コードを CodeCommit に push する<a class="headerlink" href="#2-3-codecommit-push" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>git<span class="w"> </span>push<span class="w"> </span>codecommit<span class="w"> </span>main
+</code></pre></div>
+<p>ユーザー名とパスワードを求められたら、[1-1] で控えた認証情報を入力する。</p>
+<p>CodeCommit コンソールでコードが表示されれば成功。</p>
+<blockquote>
+<p><strong>認証情報がキャッシュされない場合:</strong>
+毎回パスワードを求められるのを防ぐには以下を実行する。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>git<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>credential.helper<span class="w"> </span>store
+</code></pre></div></p>
+</blockquote>
+<hr />
+<h2 id="3-ec2-codedeploy">[3] EC2 に CodeDeploy エージェントを導入する<a class="headerlink" href="#3-ec2-codedeploy" title="Permanent link">&para;</a></h2>
+<h3 id="3-1-ec2-ssh">3-1. EC2 に SSH 接続する<a class="headerlink" href="#3-1-ec2-ssh" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>ssh<span class="w"> </span>-i<span class="w"> </span>~/.ssh/<span class="o">[</span>キーペア名<span class="o">]</span>.pem<span class="w"> </span>ubuntu@&lt;EC2のパブリックIP&gt;
+</code></pre></div>
+<hr />
+<h3 id="3-2-codedeploy">3-2. CodeDeploy エージェントをインストールする<a class="headerlink" href="#3-2-codedeploy" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>update
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>ruby-full<span class="w"> </span>wget<span class="w"> </span>-y
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>wget<span class="w"> </span>https://aws-codedeploy-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/latest/install
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>chmod<span class="w"> </span>+x<span class="w"> </span>./install
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>sudo<span class="w"> </span>./install<span class="w"> </span>auto
+</code></pre></div>
+<hr />
+<h3 id="3-3">3-3. 動作確認と自動起動設定<a class="headerlink" href="#3-3" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># 状態確認</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>codedeploy-agent
+</code></pre></div>
+<p><code>active (running)</code> が表示されれば OK。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># OS 再起動時に自動起動するよう設定</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>codedeploy-agent
+</code></pre></div>
+<hr />
+<h2 id="4-appspecyml">[4] appspec.yml とデプロイスクリプトを作成する<a class="headerlink" href="#4-appspecyml" title="Permanent link">&para;</a></h2>
+<p>ローカル（WSL）で作業する。<code>appspec.yml</code> はリポジトリのルートに置く必要がある。</p>
+<h3 id="4-1-appspecyml">4-1. appspec.yml を作成する<a class="headerlink" href="#4-1-appspecyml" title="Permanent link">&para;</a></h3>
+<p><code>/mnt/c/Users/ohtsu/Documents/AWS/claudecode/appspec.yml</code> を作成：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">os</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">linux</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nt">files</span><span class="p">:</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nt">destination</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/samurai-repo</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="nt">permissions</span><span class="p">:</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">object</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/root/samurai-repo</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="nt">owner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="nt">type</span><span class="p">:</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">directory</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">file</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="nt">hooks</span><span class="p">:</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">  </span><span class="nt">ApplicationStop</span><span class="p">:</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scripts/stop.sh</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="w">      </span><span class="nt">runas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">  </span><span class="nt">AfterInstall</span><span class="p">:</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scripts/install.sh</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="w">      </span><span class="nt">runas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a><span class="w">  </span><span class="nt">ApplicationStart</span><span class="p">:</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">location</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scripts/start.sh</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a><span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a><span class="w">      </span><span class="nt">runas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">root</span>
+</code></pre></div>
+<hr />
+<h3 id="4-2">4-2. デプロイ用スクリプトを作成する<a class="headerlink" href="#4-2" title="Permanent link">&para;</a></h3>
+<p><code>scripts/</code> フォルダを作成し、以下の 3 ファイルを追加する。</p>
+<p><strong>scripts/stop.sh</strong>（アプリを停止）：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>pm2<span class="w"> </span>stop<span class="w"> </span>handson-app<span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">true</span>
+</code></pre></div>
+<p><strong>scripts/install.sh</strong>（本番用依存関係をインストール）：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nb">cd</span><span class="w"> </span>/root/samurai-repo/phase05/backend
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>npm<span class="w"> </span>ci<span class="w"> </span>--omit<span class="o">=</span>dev
+</code></pre></div>
+<p><strong>scripts/start.sh</strong>（アプリを起動）：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="nb">cd</span><span class="w"> </span>/root/samurai-repo/phase05/backend
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>pm2<span class="w"> </span>restart<span class="w"> </span>handson-app
+</code></pre></div>
+<p>スクリプトに実行権限を付与する：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>chmod<span class="w"> </span>+x<span class="w"> </span>scripts/stop.sh<span class="w"> </span>scripts/install.sh<span class="w"> </span>scripts/start.sh
+</code></pre></div>
+<hr />
+<h2 id="5-buildspecyml">[5] buildspec.yml を作成する<a class="headerlink" href="#5-buildspecyml" title="Permanent link">&para;</a></h2>
+<p><code>/mnt/c/Users/ohtsu/Documents/AWS/claudecode/buildspec.yml</code> を作成：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="nt">phases</span><span class="p">:</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">install</span><span class="p">:</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="nt">runtime-versions</span><span class="p">:</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">      </span><span class="nt">nodejs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo &quot;Installing backend dependencies...&quot;</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cd phase05/backend &amp;&amp; npm ci</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo &quot;Installing frontend dependencies...&quot;</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cd phase05/frontend &amp;&amp; npm ci</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo &quot;Building backend (TypeScript)...&quot;</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cd phase05/backend &amp;&amp; npm run build</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo &quot;Building frontend (Vite)...&quot;</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cd phase05/frontend &amp;&amp; npm run build</span>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="nt">artifacts</span><span class="p">:</span>
+<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a><span class="w">  </span><span class="nt">files</span><span class="p">:</span>
+<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">appspec.yml</span>
+<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scripts/**/*</span>
+<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phase05/backend/dist/**/*</span>
+<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phase05/backend/package.json</span>
+<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phase05/backend/package-lock.json</span>
+<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phase05/backend/.env</span>
+<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">phase05/frontend/dist/**/*</span>
+<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a><span class="w">  </span><span class="nt">base-directory</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;.&#39;</span>
+<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a><span class="w">  </span><span class="nt">discard-paths</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">no</span>
+</code></pre></div>
+<blockquote>
+<p><strong><code>npm ci</code> と <code>npm install</code> の違い:</strong>
+<code>npm ci</code> は <code>package-lock.json</code> を厳密に参照してインストールするため、
+CI/CD 環境では <code>npm ci</code> を使うのが標準。</p>
+<p>⚠️ <strong><code>.env</code> ファイルについて:</strong>
+<code>.gitignore</code> に含まれているため CodeCommit には push されていない。
+<code>.env</code> は EC2 上に直接置いてあるものを使い続けるため、アーティファクトには含めない。
+上記の <code>buildspec.yml</code> の <code>.env</code> の行は削除しておくこと。</p>
+</blockquote>
+<hr />
+<h2 id="6-codedeploy">[6] CodeDeploy を設定する<a class="headerlink" href="#6-codedeploy" title="Permanent link">&para;</a></h2>
+<h3 id="6-1">6-1. アプリケーションを作成する<a class="headerlink" href="#6-1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>CodeDeploy コンソールを開く</li>
+<li><strong>「アプリケーション」</strong> → <strong>「アプリケーションの作成」</strong> をクリック</li>
+<li>以下を入力：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>アプリケーション名</td>
+<td><code>handson-app</code></td>
+</tr>
+<tr>
+<td>コンピューティングプラットフォーム</td>
+<td>EC2/オンプレミス</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>「アプリケーションの作成」</strong> をクリック</li>
+</ol>
+<hr />
+<h3 id="6-2">6-2. デプロイグループを作成する<a class="headerlink" href="#6-2" title="Permanent link">&para;</a></h3>
+<ol>
+<li>作成したアプリケーション → <strong>「デプロイグループの作成」</strong> をクリック</li>
+<li>以下を設定する：</li>
+</ol>
+<p><strong>基本設定：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>デプロイグループ名</td>
+<td><code>handson-deploy-group</code></td>
+</tr>
+<tr>
+<td>サービスロール</td>
+<td><code>handson-codedeploy-role</code>（[1-3] で作成したロール）</td>
+</tr>
+<tr>
+<td>デプロイタイプ</td>
+<td>インプレース</td>
+</tr>
+</tbody>
+</table>
+<p><strong>環境設定（デプロイ対象の EC2 を指定）：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>環境設定</td>
+<td>「Amazon EC2 インスタンス」を選択</td>
+</tr>
+<tr>
+<td>タグキー</td>
+<td><code>Name</code></td>
+</tr>
+<tr>
+<td>タグ値</td>
+<td>対象 EC2 の Name タグの値</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>EC2 の Name タグは EC2 コンソール → インスタンス → 対象 EC2 の「名前」列で確認する。</p>
+</blockquote>
+<p><strong>エージェントの設定：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AWS Systems Manager を使用したエージェントのインストール</td>
+<td>チェックを外す（すでに [3] でインストール済み）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>デプロイ設定：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>デプロイ設定</td>
+<td><code>CodeDeployDefault.AllAtOnce</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>ロードバランサー：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ロードバランシングを有効にする</td>
+<td>チェックを外す</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>「デプロイグループの作成」</strong> をクリック</li>
+</ol>
+<hr />
+<h2 id="7-codebuild">[7] CodeBuild プロジェクトを作成する<a class="headerlink" href="#7-codebuild" title="Permanent link">&para;</a></h2>
+<h3 id="7-1">7-1. ビルドプロジェクトを作成する<a class="headerlink" href="#7-1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>CodeBuild コンソールを開く</li>
+<li><strong>「ビルドプロジェクトを作成する」</strong> をクリック</li>
+<li>以下を設定する：</li>
+</ol>
+<p><strong>プロジェクトの設定：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>プロジェクト名</td>
+<td><code>handson-build</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>ソース：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ソースプロバイダー</td>
+<td>AWS CodeCommit</td>
+</tr>
+<tr>
+<td>リポジトリ</td>
+<td><code>handson-repo</code></td>
+</tr>
+<tr>
+<td>ブランチ</td>
+<td><code>main</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>環境：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>環境イメージ</td>
+<td>マネージド型イメージ</td>
+</tr>
+<tr>
+<td>オペレーティングシステム</td>
+<td>Ubuntu</td>
+</tr>
+<tr>
+<td>ランタイム</td>
+<td>Standard</td>
+</tr>
+<tr>
+<td>イメージ</td>
+<td><code>aws/codebuild/standard:7.0</code></td>
+</tr>
+<tr>
+<td>サービスロール</td>
+<td>「新しいサービスロールを作成する」を選択</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Buildspec：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ビルド仕様</td>
+<td>「buildspec ファイルを使用する」を選択</td>
+</tr>
+</tbody>
+</table>
+<p><strong>アーティファクト：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>タイプ</td>
+<td>Amazon S3</td>
+</tr>
+<tr>
+<td>バケット名</td>
+<td><code>handson-[名前]-files</code>（既存のバケットを選択）</td>
+</tr>
+<tr>
+<td>名前</td>
+<td><code>handson-artifact</code></td>
+</tr>
+<tr>
+<td>アーティファクトのパッケージ化</td>
+<td>Zip</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>「ビルドプロジェクトを作成する」</strong> をクリック</li>
+</ol>
+<hr />
+<h2 id="8-codepipeline">[8] CodePipeline でパイプラインを作成する<a class="headerlink" href="#8-codepipeline" title="Permanent link">&para;</a></h2>
+<h3 id="8-1">8-1. パイプラインを作成する<a class="headerlink" href="#8-1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>CodePipeline コンソールを開く</li>
+<li><strong>「パイプラインを作成する」</strong> をクリック</li>
+</ol>
+<p><strong>パイプラインの設定：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>パイプライン名</td>
+<td><code>handson-pipeline</code></td>
+</tr>
+<tr>
+<td>サービスロール</td>
+<td>「新しいサービスロールを作成する」を選択</td>
+</tr>
+</tbody>
+</table>
+<p><strong>「次へ」</strong> をクリック。</p>
+<hr />
+<h3 id="8-2">8-2. ソースステージを設定する<a class="headerlink" href="#8-2" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ソースプロバイダー</td>
+<td>AWS CodeCommit</td>
+</tr>
+<tr>
+<td>リポジトリ名</td>
+<td><code>handson-repo</code></td>
+</tr>
+<tr>
+<td>ブランチ名</td>
+<td><code>main</code></td>
+</tr>
+<tr>
+<td>変更検出オプション</td>
+<td>Amazon CloudWatch Events（push を自動検知する）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>「次へ」</strong> をクリック。</p>
+<hr />
+<h3 id="8-3">8-3. ビルドステージを設定する<a class="headerlink" href="#8-3" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ビルドプロバイダー</td>
+<td>AWS CodeBuild</td>
+</tr>
+<tr>
+<td>プロジェクト名</td>
+<td><code>handson-build</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>「次へ」</strong> をクリック。</p>
+<hr />
+<h3 id="8-4">8-4. デプロイステージを設定する<a class="headerlink" href="#8-4" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>デプロイプロバイダー</td>
+<td>AWS CodeDeploy</td>
+</tr>
+<tr>
+<td>アプリケーション名</td>
+<td><code>handson-app</code></td>
+</tr>
+<tr>
+<td>デプロイグループ</td>
+<td><code>handson-deploy-group</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>「次へ」</strong> → <strong>「パイプラインを作成する」</strong> をクリック。</p>
+<blockquote>
+<p>パイプライン作成直後に最初のデプロイが自動で実行される。</p>
+</blockquote>
+<hr />
+<h2 id="9">[9] 動作確認<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<h3 id="9-1">9-1. パイプラインの初回実行を確認する<a class="headerlink" href="#9-1" title="Permanent link">&para;</a></h3>
+<p>CodePipeline コンソール → <code>handson-pipeline</code> を開き、各ステージが緑になることを確認する。</p>
+<table>
+<thead>
+<tr>
+<th>ステージ</th>
+<th>正常時の表示</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>成功</td>
+</tr>
+<tr>
+<td>Deploy</td>
+<td>成功</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⏱️ 初回は 5〜10 分かかる。</p>
+<p><strong>Build が失敗する場合:</strong>
+CodeBuild コンソール → <code>handson-build</code> → 該当のビルド → <strong>「ビルドログ」</strong> タブでエラー内容を確認する。</p>
+<p><strong>Deploy が失敗する場合:</strong>
+CodeDeploy コンソール → <code>handson-app</code> → デプロイ履歴 → 該当デプロイ → <strong>「イベント」</strong> タブでエラー内容を確認する。</p>
+</blockquote>
+<hr />
+<h3 id="9-2-push">9-2. コードを変更して push する<a class="headerlink" href="#9-2-push" title="Permanent link">&para;</a></h3>
+<p>ローカルでアプリのコードを少し変更して（例：レビュー一覧ページのタイトルを変更）、CodeCommit に push する。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nb">cd</span><span class="w"> </span>/mnt/c/Users/ohtsu/Documents/AWS/claudecode
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;test: CI/CD 動作確認&quot;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>git<span class="w"> </span>push<span class="w"> </span>codecommit<span class="w"> </span>main
+</code></pre></div>
+<hr />
+<h3 id="9-3">9-3. パイプラインが自動で動くことを確認する<a class="headerlink" href="#9-3" title="Permanent link">&para;</a></h3>
+<p>CodePipeline コンソールで <code>handson-pipeline</code> を開き、push を検知してパイプラインが自動で起動することを確認する。</p>
+<hr />
+<h3 id="9-4-ec2">9-4. EC2 に変更が反映されることを確認する<a class="headerlink" href="#9-4-ec2" title="Permanent link">&para;</a></h3>
+<p>ブラウザでアプリにアクセスし、コードの変更が反映されていることを確認する。</p>
+<hr />
+<h2 id="10">[10] ハンズオン終了後のリソース削除<a class="headerlink" href="#10" title="Permanent link">&para;</a></h2>
+<p>以下の順番で削除する。</p>
+<table>
+<thead>
+<tr>
+<th>リソース</th>
+<th>削除場所</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CodePipeline</td>
+<td>CodePipeline コンソール → <code>handson-pipeline</code> → 削除</td>
+</tr>
+<tr>
+<td>CodeBuild</td>
+<td>CodeBuild コンソール → <code>handson-build</code> → 削除</td>
+</tr>
+<tr>
+<td>CodeDeploy（デプロイグループ）</td>
+<td>CodeDeploy → <code>handson-app</code> → <code>handson-deploy-group</code> → 削除</td>
+</tr>
+<tr>
+<td>CodeDeploy（アプリケーション）</td>
+<td>CodeDeploy → <code>handson-app</code> → 削除</td>
+</tr>
+<tr>
+<td>CodeCommit</td>
+<td>CodeCommit コンソール → <code>handson-repo</code> → 削除</td>
+</tr>
+<tr>
+<td>S3 アーティファクト</td>
+<td>S3 コンソール → バケット内の <code>handson-artifact</code> フォルダ → 削除</td>
+</tr>
+<tr>
+<td>IAM ロール</td>
+<td>IAM → <code>handson-codedeploy-role</code> → 削除</td>
+</tr>
+</tbody>
+</table>
+<p>EC2 の IAM ロールに追加したポリシーも外す場合は、<code>handson-ec2-role</code> から以下をデタッチする：
+- <code>AmazonEC2RoleforAWSCodeDeploy</code>
+- <code>AmazonS3ReadOnlyAccess</code></p>
+<hr />
+<h2 id="_7">コスト目安<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>リソース</th>
+<th>費用</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CodeCommit</td>
+<td><strong>無料</strong></td>
+<td>アクティブユーザー 5 人まで・ストレージ 5GB まで無料</td>
+</tr>
+<tr>
+<td>CodeBuild</td>
+<td><strong>無料枠</strong>：100 分/月</td>
+<td>ハンズオン程度なら $0</td>
+</tr>
+<tr>
+<td>CodeDeploy（EC2）</td>
+<td><strong>無料</strong></td>
+<td>EC2 へのデプロイは無料</td>
+</tr>
+<tr>
+<td>CodePipeline</td>
+<td><strong>無料</strong>：1 パイプラインまで</td>
+<td>2 つ目以降は $1/月</td>
+</tr>
+<tr>
+<td>S3（アーティファクト）</td>
+<td>数円程度</td>
+<td>ビルド成果物の保存容量による</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  ページトップへ戻る
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

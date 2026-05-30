@@ -1,0 +1,2693 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="AWS の主要サービスを段階的に学ぶためのハンズオン手順書">
+      
+      
+      
+        <link rel="canonical" href="https://ohtsuka-shota-se.github.io/samurai-repo/10_ECS_Fargate_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="prev" href="../09_CodeCommit_CICD_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="next" href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Phase 10 - ECS/Fargate（コンテナ化） - AWS 学習ハンズオン</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-10-ecsfargate" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href=".." title="AWS 学習ハンズオン" class="md-header__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AWS 学習ハンズオン
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 10 - ECS/Fargate（コンテナ化）
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="タブ" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  ホーム
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  ハンズオン手順書
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  参考資料
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AWS 学習ハンズオン" class="md-nav__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AWS 学習ハンズオン
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ホーム
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ハンズオン手順書
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ハンズオン手順書
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 - EC2・S3・IAM・VPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_Cognito_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 - Cognito（認証）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03_DynamoDB_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 - DynamoDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_Lambda_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 - Lambda・SNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_Bedrock_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 5 - Bedrock（AI）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_ALB_AutoScaling_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 6 - ALB・Auto Scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07_CloudFront_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 7 - CloudFront（CDN）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08_CloudWatch_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 8 - CloudWatch・SNS（監視）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09_CodeCommit_CICD_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 9 - CodeCommit・CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 10 - ECS/Fargate（コンテナ化）
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 10 - ECS/Fargate（コンテナ化）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コンテナ / Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dockerfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        イメージ / レジストリ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecrelastic-container-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECR（Elastic Container Registry）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecselastic-container-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS（Elastic Container Service）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fargate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fargate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        タスク定義
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS サービス
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        クラスター
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] Dockerfile を作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1] Dockerfile を作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. Dockerfile をリポジトリルートに作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-dockerignore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. .dockerignore を作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ecr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] ECR リポジトリを作成する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ecs-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] ECS 用 IAM ロールを準備する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[3] ECS 用 IAM ロールを準備する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-1. タスク実行ロールを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-2. タスクロールの確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-3-codebuild-ecrecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-3. CodeBuild のロールに ECR・ECS 権限を追加する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] ECS クラスターを作成する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] タスク定義を作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[5] タスク定義を作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-1. タスク定義を作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-2. 環境変数を設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-3. ログの設定をする
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-ecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [6] ECS サービスを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[6] ECS サービスを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-1. セキュリティグループを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-2. サービスを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [7] 動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[7] 動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-1-ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-1. タスクのパブリック IP を確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-2. ブラウザでアクセスする
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-cicd-ecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [8] CI/CD を ECS 向けに更新する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[8] CI/CD を ECS 向けに更新する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8-1-buildspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-1. buildspec.yml を書き換える
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-2-codebuild-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-2. CodeBuild で Docker を使えるようにする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-3-codepipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-3. CodePipeline からデプロイステージを削除する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-4. 動作確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [9] ハンズオン終了後のリソース削除
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コスト目安
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    参考資料
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    参考資料
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ローカル開発環境のセットアップ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E4%BF%AE%E6%AD%A3%E3%83%BB%E5%A4%89%E6%9B%B4%E5%B1%A5%E6%AD%B4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修正・変更履歴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GitHub%E7%AE%A1%E7%90%86%E6%96%B9%E9%87%9D%E3%81%A8push%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub管理方針
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コンテナ / Docker
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dockerfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        イメージ / レジストリ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecrelastic-container-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECR（Elastic Container Registry）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecselastic-container-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS（Elastic Container Service）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fargate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fargate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        タスク定義
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ECS サービス
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        クラスター
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] Dockerfile を作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1] Dockerfile を作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. Dockerfile をリポジトリルートに作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2-dockerignore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. .dockerignore を作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ecr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] ECR リポジトリを作成する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-ecs-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] ECS 用 IAM ロールを準備する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[3] ECS 用 IAM ロールを準備する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-1. タスク実行ロールを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-2. タスクロールの確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-3-codebuild-ecrecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-3. CodeBuild のロールに ECR・ECS 権限を追加する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] ECS クラスターを作成する
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] タスク定義を作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[5] タスク定義を作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-1. タスク定義を作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-2. 環境変数を設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-3. ログの設定をする
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-ecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [6] ECS サービスを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[6] ECS サービスを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-1. セキュリティグループを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6-2. サービスを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [7] 動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[7] 動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-1-ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-1. タスクのパブリック IP を確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7-2. ブラウザでアクセスする
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-cicd-ecs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [8] CI/CD を ECS 向けに更新する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[8] CI/CD を ECS 向けに更新する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8-1-buildspecyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-1. buildspec.yml を書き換える
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-2-codebuild-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-2. CodeBuild で Docker を使えるようにする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-3-codepipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-3. CodePipeline からデプロイステージを削除する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-4. 動作確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [9] ハンズオン終了後のリソース削除
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コスト目安
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="phase-10-ecsfargate">Phase 10: ECS/Fargate ハンズオン手順<a class="headerlink" href="#phase-10-ecsfargate" title="Permanent link">&para;</a></h1>
+<p>作成日: 2026-05-30</p>
+<p>対象: AWS未経験者向けハンズオン（10回目）</p>
+<hr />
+<h2 id="_1">前提条件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>前提条件</th>
+<th>確認方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 09 の CodeCommit・CodePipeline が動作していること</td>
+<td>CodePipeline コンソール → <code>handson-pipeline</code> が成功している</td>
+</tr>
+<tr>
+<td><code>handson-ec2-role</code> が存在していること</td>
+<td>IAM コンソール → ロール → <code>handson-ec2-role</code> を確認</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>✅ <strong>ALB・EC2 は起動していなくて構わない。</strong>
+本手順は Fargate コンテナに直接アクセスする構成のため、ALB は不要。
+費用削減のため、使用しない場合は停止・削除したままで問題ない。</p>
+</blockquote>
+<hr />
+<h2 id="_2">完成後イメージ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>ローカルで git push
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>CodeCommit → CodePipeline
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>CodeBuild（Docker イメージをビルド → ECR に push → ECS サービス更新）
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>ECS/Fargate（コンテナが自動起動・パブリック IP が割り当てられる）
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>ブラウザから http://[FargateタスクのパブリックIP]:3000 でアクセス
+</code></pre></div>
+<hr />
+<h2 id="_3">環境イメージ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TB
+    Dev["💻 ローカル（開発者）"]
+    User["👤 ユーザー（ブラウザ）"]
+
+    subgraph CICD["CI/CD（Phase 09 から継続・ECS 向けに更新）"]
+        CC["📦 CodeCommit\nhandson-repo"]
+        CP["🔁 CodePipeline\nhandson-pipeline"]
+        CB["🔨 CodeBuild\nhandson-build\n（Docker ビルド）"]
+        ECR["🐳 ECR\nhandson-app"]
+    end
+
+    subgraph Tokyo["ap-northeast-1（東京）"]
+        Cognito["🔐 Cognito\nhandson-user-pool"]
+
+        subgraph VPC["VPC: handson-vpc"]
+            subgraph ECS["ECS クラスター: handson-cluster（Phase 10 で追加）"]
+                T1["🟦 Fargate タスク\nhandson-service\nパブリックIP:3000"]
+            end
+        end
+
+        S3["🪣 S3\nhandson-[名前]-files"]
+        DDB["🗄️ DynamoDB\nhandson-reviews"]
+        CWL["📋 CloudWatch Logs\n/ecs/handson-task"]
+    end
+
+    Dev --&gt;|git push| CC
+    CC --&gt; CP
+    CP --&gt; CB
+    CB --&gt;|docker push| ECR
+    CB --&gt;|ecs update-service| T1
+    ECR --&gt;|イメージ取得| T1
+
+    User --&gt;|http://IP:3000| T1
+    T1 --&gt; S3
+    T1 --&gt; DDB
+    T1 --&gt;|JWT検証| Cognito
+    T1 --&gt;|ログ転送| CWL</code></pre>
+<hr />
+<h2 id="_4">全体の流れ<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[1] Dockerfile を作成する
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    ↓
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>[2] ECR リポジトリを作成する
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ↓
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>[3] ECS 用 IAM ロールを準備する
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    ↓
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>[4] ECS クラスターを作成する
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    ↓
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>[5] タスク定義を作成する
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    ↓
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>[6] ECS サービスを作成する
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    ↓
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>[7] 動作確認
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    ↓
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>[8] CI/CD を ECS 向けに更新する
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    ↓
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>[9] ハンズオン終了後のリソース削除
+</code></pre></div>
+<hr />
+<h2 id="aws">AWS 用語集<a class="headerlink" href="#aws" title="Permanent link">&para;</a></h2>
+<h3 id="docker">コンテナ / Docker<a class="headerlink" href="#docker" title="Permanent link">&para;</a></h3>
+<p>アプリとその実行環境（Node.js・ライブラリなど）をひとまとめにした箱のようなもの。
+「どの EC2 でも同じ環境で動く」ことが保証される。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>【今まで】
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>EC2 に Node.js をインストール → アプリを配置 → 起動
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>（EC2 の状態に依存）
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>【コンテナ化後】
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>Docker イメージ（環境ごとパッケージ）→ どこでも同じように起動
+</code></pre></div>
+<h3 id="dockerfile">Dockerfile<a class="headerlink" href="#dockerfile" title="Permanent link">&para;</a></h3>
+<p>コンテナイメージを作るための設計書。
+「どの Node.js バージョンを使い、どのファイルをコピーし、何を実行するか」を記述する。</p>
+<h3 id="_5">イメージ / レジストリ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p><strong>イメージ</strong>: Dockerfile からビルドした完成品（設計図から作った実行可能なパッケージ）。
+<strong>レジストリ</strong>: イメージを保管・管理する場所。AWS では ECR がこれにあたる。</p>
+<h3 id="ecrelastic-container-registry">ECR（Elastic Container Registry）<a class="headerlink" href="#ecrelastic-container-registry" title="Permanent link">&para;</a></h3>
+<p>Docker イメージを AWS 上で保管するサービス。
+GitHub に対する Docker Hub のような位置づけ。</p>
+<h3 id="ecselastic-container-service">ECS（Elastic Container Service）<a class="headerlink" href="#ecselastic-container-service" title="Permanent link">&para;</a></h3>
+<p>コンテナの起動・管理・スケーリングを行うサービス。
+「このイメージを何個起動して…」という設定を管理する。</p>
+<h3 id="fargate">Fargate<a class="headerlink" href="#fargate" title="Permanent link">&para;</a></h3>
+<p>ECS でコンテナを動かすための実行環境。
+EC2 を自分で管理せずにコンテナを動かせる（サーバーレスなコンテナ実行環境）。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>【EC2 起動タイプ】EC2 インスタンスを自分で管理 → その上でコンテナを動かす
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>【Fargate 起動タイプ】EC2 不要 → AWS がインフラを管理 → コンテナだけ定義すればOK
+</code></pre></div>
+<h3 id="_6">タスク定義<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>ECS でコンテナを起動するための設定書。
+「どのイメージを使い、CPU・メモリはどれくらいで、環境変数は何か」を定義する。</p>
+<h3 id="ecs">ECS サービス<a class="headerlink" href="#ecs" title="Permanent link">&para;</a></h3>
+<p>タスク定義をもとに「常に N 個のコンテナを維持する」設定。
+コンテナが落ちたら自動で再起動する。</p>
+<h3 id="_7">クラスター<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>ECS のコンテナをまとめて管理する単位。フォルダのようなもの。</p>
+<hr />
+<h2 id="1-dockerfile">[1] Dockerfile を作成する<a class="headerlink" href="#1-dockerfile" title="Permanent link">&para;</a></h2>
+<h3 id="1-1-dockerfile">1-1. Dockerfile をリポジトリルートに作成する<a class="headerlink" href="#1-1-dockerfile" title="Permanent link">&para;</a></h3>
+<p><code>/mnt/c/Users/ohtsu/Documents/AWS/claudecode/Dockerfile</code> を作成：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c"># ── ステージ1: フロントエンドのビルド ──</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">FROM</span><span class="w"> </span><span class="s">node:22-alpine</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">frontend-builder</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app/frontend</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">COPY</span><span class="w"> </span>phase05/frontend/package*.json<span class="w"> </span>./
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>ci
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="k">COPY</span><span class="w"> </span>phase05/frontend/<span class="w"> </span>./
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c"># ── ステージ2: バックエンドのビルド ──</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="k">FROM</span><span class="w"> </span><span class="s">node:22-alpine</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">backend-builder</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app/backend</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="k">COPY</span><span class="w"> </span>phase05/backend/package*.json<span class="w"> </span>./
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>ci
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="k">COPY</span><span class="w"> </span>phase05/backend/<span class="w"> </span>./
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="c"># ── ステージ3: 本番イメージ ──</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="k">FROM</span><span class="w"> </span><span class="s">node:22-alpine</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app/backend</span>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="c"># バックエンドの本番依存関係のみインストール</span>
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="k">COPY</span><span class="w"> </span>phase05/backend/package*.json<span class="w"> </span>./
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="k">RUN</span><span class="w"> </span>npm<span class="w"> </span>ci<span class="w"> </span>--omit<span class="o">=</span>dev
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a><span class="c"># ビルド済みファイルをコピー</span>
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a><span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>backend-builder<span class="w"> </span>/app/backend/dist<span class="w"> </span>./dist
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a><span class="k">COPY</span><span class="w"> </span>--from<span class="o">=</span>frontend-builder<span class="w"> </span>/app/frontend/dist<span class="w"> </span>../frontend/dist
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a><span class="k">EXPOSE</span><span class="w"> </span><span class="s">3000</span>
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;node&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;dist/index.js&quot;</span><span class="p">]</span>
+</code></pre></div>
+<blockquote>
+<p><strong>マルチステージビルドとは:</strong>
+ビルド環境（node_modules 含む）と本番環境を分けることで、
+イメージサイズを小さく保つ手法。本番イメージには不要なファイルが含まれない。</p>
+</blockquote>
+<hr />
+<h3 id="1-2-dockerignore">1-2. .dockerignore を作成する<a class="headerlink" href="#1-2-dockerignore" title="Permanent link">&para;</a></h3>
+<p>不要なファイルをイメージに含めないよう <code>.dockerignore</code> を作成する。</p>
+<p><code>/mnt/c/Users/ohtsu/Documents/AWS/claudecode/.dockerignore</code>：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>node_modules
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>*/node_modules
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>*/dist
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>.git
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>*.md
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>.env
+</code></pre></div>
+<hr />
+<h2 id="2-ecr">[2] ECR リポジトリを作成する<a class="headerlink" href="#2-ecr" title="Permanent link">&para;</a></h2>
+<ol>
+<li>ECR コンソールを開く（リージョン：東京 ap-northeast-1）</li>
+<li><strong>「リポジトリを作成」</strong> をクリック</li>
+<li>以下を入力：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可視性設定</td>
+<td>プライベート</td>
+</tr>
+<tr>
+<td>リポジトリ名</td>
+<td><code>handson-app</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>「リポジトリを作成」</strong> をクリック</li>
+<li>作成されたリポジトリの <strong>URI</strong> を控える
+   （例：<code>123456789012.dkr.ecr.ap-northeast-1.amazonaws.com/handson-app</code>）</li>
+</ol>
+<hr />
+<h2 id="3-ecs-iam">[3] ECS 用 IAM ロールを準備する<a class="headerlink" href="#3-ecs-iam" title="Permanent link">&para;</a></h2>
+<p>ECS/Fargate では 2 種類の IAM ロールが必要になる。</p>
+<table>
+<thead>
+<tr>
+<th>ロール</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>タスク実行ロール</td>
+<td>ECR からイメージを取得・CloudWatch Logs にログを書き込む権限</td>
+</tr>
+<tr>
+<td>タスクロール</td>
+<td>コンテナ内のアプリが DynamoDB・S3・Cognito 等を使う権限</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-1">3-1. タスク実行ロールを作成する<a class="headerlink" href="#3-1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>IAM コンソール → <strong>「ロールを作成」</strong></li>
+<li><strong>信頼されたエンティティタイプ</strong>：「AWS のサービス」</li>
+<li><strong>ユースケース</strong>：「Elastic Container Service」→「<strong>Elastic Container Service Task</strong>」を選択 → <strong>「次へ」</strong></li>
+<li><code>AmazonECSTaskExecutionRolePolicy</code> にチェック → <strong>「次へ」</strong></li>
+<li><strong>ロール名</strong>：<code>handson-ecs-task-execution-role</code> → <strong>「ロールを作成」</strong></li>
+</ol>
+<hr />
+<h3 id="3-2">3-2. タスクロールの確認<a class="headerlink" href="#3-2" title="Permanent link">&para;</a></h3>
+<p>タスクロールは既存の <code>handson-ec2-role</code> を流用できる。
+DynamoDB・S3・Cognito・Bedrock 等の権限がそのまま使える。</p>
+<hr />
+<h3 id="3-3-codebuild-ecrecs">3-3. CodeBuild のロールに ECR・ECS 権限を追加する<a class="headerlink" href="#3-3-codebuild-ecrecs" title="Permanent link">&para;</a></h3>
+<ol>
+<li>IAM コンソール → <strong>ロール</strong> → <code>codebuild-handson-build-service-role</code> を開く</li>
+<li><strong>「許可を追加」</strong> → <strong>「ポリシーをアタッチ」</strong></li>
+<li>以下の 2 つを追加：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>ポリシー名</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AmazonEC2ContainerRegistryFullAccess</code></td>
+<td>ECR へのログイン・push</td>
+</tr>
+<tr>
+<td><code>AmazonECS_FullAccess</code></td>
+<td>ECS サービスの更新</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-ecs">[4] ECS クラスターを作成する<a class="headerlink" href="#4-ecs" title="Permanent link">&para;</a></h2>
+<ol>
+<li>ECS コンソールを開く</li>
+<li><strong>「クラスターの作成」</strong> をクリック</li>
+<li>以下を設定：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>クラスター名</td>
+<td><code>handson-cluster</code></td>
+</tr>
+<tr>
+<td>インフラストラクチャ</td>
+<td>AWS Fargate（サーバーレス）</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>「作成」</strong> をクリック</li>
+</ol>
+<hr />
+<h2 id="5">[5] タスク定義を作成する<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<h3 id="5-1">5-1. タスク定義を作成する<a class="headerlink" href="#5-1" title="Permanent link">&para;</a></h3>
+<ol>
+<li>ECS コンソール → <strong>「タスク定義」</strong> → <strong>「新しいタスク定義の作成」</strong></li>
+<li>以下を設定：</li>
+</ol>
+<p><strong>タスク定義の設定：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>タスク定義ファミリー</td>
+<td><code>handson-task</code></td>
+</tr>
+<tr>
+<td>起動タイプ</td>
+<td>AWS Fargate</td>
+</tr>
+<tr>
+<td>オペレーティングシステム</td>
+<td>Linux/X86_64</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>0.5 vCPU</td>
+</tr>
+<tr>
+<td>メモリ</td>
+<td>1 GB</td>
+</tr>
+<tr>
+<td>タスク実行ロール</td>
+<td><code>handson-ecs-task-execution-role</code></td>
+</tr>
+<tr>
+<td>タスクロール</td>
+<td><code>handson-ec2-role</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>コンテナの設定：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>コンテナ名</td>
+<td><code>handson-app</code></td>
+</tr>
+<tr>
+<td>イメージ URI</td>
+<td><code>[ECR の URI]/handson-app:latest</code>（[2] で控えた URI）</td>
+</tr>
+<tr>
+<td>コンテナポート</td>
+<td><code>3000</code></td>
+</tr>
+<tr>
+<td>プロトコル</td>
+<td>TCP</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="5-2">5-2. 環境変数を設定する<a class="headerlink" href="#5-2" title="Permanent link">&para;</a></h3>
+<p><code>.env</code> に書いていた値をコンテナの環境変数として設定する。</p>
+<p>コンテナの設定画面 → <strong>「環境変数」</strong> に以下を追加：</p>
+<table>
+<thead>
+<tr>
+<th>キー</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AWS_REGION</code></td>
+<td><code>ap-northeast-1</code></td>
+</tr>
+<tr>
+<td><code>S3_BUCKET_NAME</code></td>
+<td><code>handson-[名前]-files</code></td>
+</tr>
+<tr>
+<td><code>COGNITO_USER_POOL_ID</code></td>
+<td>Cognito コンソールで確認</td>
+</tr>
+<tr>
+<td><code>COGNITO_CLIENT_ID</code></td>
+<td>Cognito コンソールで確認</td>
+</tr>
+<tr>
+<td><code>DYNAMODB_TABLE_NAME</code></td>
+<td><code>handson-reviews</code></td>
+</tr>
+<tr>
+<td><code>BEDROCK_REGION</code></td>
+<td><code>us-east-1</code></td>
+</tr>
+<tr>
+<td><code>PORT</code></td>
+<td><code>3000</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>EC2 が起動している場合は以下で値を確認できる。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>cat<span class="w"> </span>/root/samurai-repo/phase05/backend/.env
+</code></pre></div></p>
+</blockquote>
+<hr />
+<h3 id="5-3">5-3. ログの設定をする<a class="headerlink" href="#5-3" title="Permanent link">&para;</a></h3>
+<p><strong>「ログ収集を使用」</strong> にチェックが入っていることを確認（デフォルトで有効）。</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ログドライバー</td>
+<td>awslogs</td>
+</tr>
+<tr>
+<td>ロググループ</td>
+<td><code>/ecs/handson-task</code>（自動生成）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>「作成」</strong> をクリック。</p>
+<hr />
+<h2 id="6-ecs">[6] ECS サービスを作成する<a class="headerlink" href="#6-ecs" title="Permanent link">&para;</a></h2>
+<h3 id="6-1">6-1. セキュリティグループを作成する<a class="headerlink" href="#6-1" title="Permanent link">&para;</a></h3>
+<p>Fargate タスクへのアクセスを許可するセキュリティグループを作成する。</p>
+<ol>
+<li>EC2 コンソール → <strong>「セキュリティグループ」</strong> → <strong>「セキュリティグループを作成」</strong></li>
+<li>以下を設定：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>セキュリティグループ名</td>
+<td><code>handson-ecs-sg</code></td>
+</tr>
+<tr>
+<td>説明</td>
+<td><code>ECS Fargate task SG</code></td>
+</tr>
+<tr>
+<td>VPC</td>
+<td><code>handson-vpc</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>インバウンドルール：</strong></p>
+<table>
+<thead>
+<tr>
+<th>タイプ</th>
+<th>プロトコル</th>
+<th>ポート</th>
+<th>ソース</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>カスタム TCP</td>
+<td>TCP</td>
+<td>3000</td>
+<td>マイ IP</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>マイ IP</strong> を選択すると、自分のグローバル IP のみアクセスを許可できる。
+学習目的で一時的に公開する場合のみ <code>0.0.0.0/0</code>（すべて）を選択する。</p>
+</blockquote>
+<ol>
+<li><strong>「セキュリティグループを作成」</strong></li>
+</ol>
+<hr />
+<h3 id="6-2">6-2. サービスを作成する<a class="headerlink" href="#6-2" title="Permanent link">&para;</a></h3>
+<ol>
+<li>ECS コンソール → <code>handson-cluster</code> → <strong>「サービスの作成」</strong></li>
+<li>以下を設定：</li>
+</ol>
+<p><strong>環境：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>起動タイプ</td>
+<td>Fargate</td>
+</tr>
+<tr>
+<td>プラットフォームバージョン</td>
+<td>LATEST</td>
+</tr>
+</tbody>
+</table>
+<p><strong>デプロイ設定：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>アプリケーションタイプ</td>
+<td>サービス</td>
+</tr>
+<tr>
+<td>ファミリー</td>
+<td><code>handson-task</code></td>
+</tr>
+<tr>
+<td>サービス名</td>
+<td><code>handson-service</code></td>
+</tr>
+<tr>
+<td>必要なタスク数</td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>ネットワーキング：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPC</td>
+<td><code>handson-vpc</code></td>
+</tr>
+<tr>
+<td>サブネット</td>
+<td><code>handson-public-subnet-1a</code>（1つ選択）</td>
+</tr>
+<tr>
+<td>セキュリティグループ</td>
+<td><code>handson-ecs-sg</code>（既存を選択）</td>
+</tr>
+<tr>
+<td>パブリック IP</td>
+<td><strong>オン</strong>（これがないと外からアクセスできない）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ロードバランシング：</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ロードバランサーの使用</td>
+<td><strong>なし</strong></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>「作成」</strong> をクリック</li>
+</ol>
+<hr />
+<h2 id="7">[7] 動作確認<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<h3 id="7-1-ip">7-1. タスクのパブリック IP を確認する<a class="headerlink" href="#7-1-ip" title="Permanent link">&para;</a></h3>
+<ol>
+<li>ECS コンソール → <code>handson-cluster</code> → <code>handson-service</code> → <strong>「タスク」</strong> タブ</li>
+<li>起動しているタスクをクリック</li>
+<li><strong>「パブリック IP」</strong> の値を控える（例：<code>54.xxx.xxx.xxx</code>）</li>
+</ol>
+<blockquote>
+<p>⏱️ タスクが <code>RUNNING</code> になるまで 2〜3 分かかる。</p>
+<p><strong>タスクが <code>STOPPED</code> になる場合:</strong>
+タスクを選択 → <strong>「ログ」</strong> タブでエラー内容を確認する。
+環境変数の設定ミスや、イメージの pull 失敗が多い。</p>
+</blockquote>
+<hr />
+<h3 id="7-2">7-2. ブラウザでアクセスする<a class="headerlink" href="#7-2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>http://[パブリックIP]:3000
+</code></pre></div>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> トップページが表示される</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> ログインできる（Cognito 認証）</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> レビュー一覧が取得できる</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> S3 ファイル管理が動作する</li>
+</ul>
+<blockquote>
+<p>⚠️ <strong>タスクを再起動するとパブリック IP が変わる。</strong>
+毎回タスクタブで IP を確認すること。</p>
+</blockquote>
+<hr />
+<h2 id="8-cicd-ecs">[8] CI/CD を ECS 向けに更新する<a class="headerlink" href="#8-cicd-ecs" title="Permanent link">&para;</a></h2>
+<h3 id="8-1-buildspecyml">8-1. buildspec.yml を書き換える<a class="headerlink" href="#8-1-buildspecyml" title="Permanent link">&para;</a></h3>
+<p><code>/mnt/c/Users/ohtsu/Documents/AWS/claudecode/buildspec.yml</code> を以下に書き換える：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nt">env</span><span class="p">:</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="nt">AWS_DEFAULT_REGION</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ap-northeast-1</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="nt">ECR_REPO_NAME</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handson-app</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="nt">ECS_CLUSTER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handson-cluster</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="nt">ECS_SERVICE</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">handson-service</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="nt">phases</span><span class="p">:</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="nt">pre_build</span><span class="p">:</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Logging in to Amazon ECR...</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ECR_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_REPO_NAME</span>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_URI</span>
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Building Docker image...</span>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker build -t $ECR_URI:latest -t $ECR_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION .</span>
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>
+<a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">  </span><span class="nt">post_build</span><span class="p">:</span>
+<a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">    </span><span class="nt">commands</span><span class="p">:</span>
+<a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Pushing Docker image to ECR...</span>
+<a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker push $ECR_URI:latest</span>
+<a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker push $ECR_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION</span>
+<a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Updating ECS service...</span>
+<a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment</span>
+<a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">echo Done.</span>
+</code></pre></div>
+<hr />
+<h3 id="8-2-codebuild-docker">8-2. CodeBuild で Docker を使えるようにする<a class="headerlink" href="#8-2-codebuild-docker" title="Permanent link">&para;</a></h3>
+<p>CodeBuild はデフォルトでは Docker が使えない設定になっている。</p>
+<ol>
+<li>CodeBuild コンソール → <code>handson-build</code> → <strong>「編集」</strong> → <strong>「環境」</strong></li>
+<li><strong>「特権付与」</strong> にチェックを入れる（Docker デーモンを使うために必要）</li>
+<li><strong>「環境の更新」</strong> をクリック</li>
+</ol>
+<hr />
+<h3 id="8-3-codepipeline">8-3. CodePipeline からデプロイステージを削除する<a class="headerlink" href="#8-3-codepipeline" title="Permanent link">&para;</a></h3>
+<p>Phase 09 のパイプラインには CodeDeploy のデプロイステージがあるが、
+ECS 向けでは <code>buildspec.yml</code> 内で <code>aws ecs update-service</code> を実行するため不要。</p>
+<ol>
+<li>CodePipeline コンソール → <code>handson-pipeline</code> → <strong>「編集」</strong></li>
+<li><strong>「Deploy」</strong> ステージ → <strong>「ステージを削除」</strong></li>
+<li><strong>「保存」</strong></li>
+</ol>
+<hr />
+<h3 id="8-4">8-4. 動作確認<a class="headerlink" href="#8-4" title="Permanent link">&para;</a></h3>
+<p>コードを変更して CodeCommit に push する。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nb">cd</span><span class="w"> </span>/mnt/c/Users/ohtsu/Documents/AWS/claudecode
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>git<span class="w"> </span>add<span class="w"> </span>.
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: ECS/Fargate 対応&quot;</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>git<span class="w"> </span>push<span class="w"> </span>codecommit<span class="w"> </span>main
+</code></pre></div>
+<p>CodePipeline コンソールで以下を確認する：</p>
+<table>
+<thead>
+<tr>
+<th>ステージ</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source</td>
+<td>CodeCommit から取得</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>Docker ビルド → ECR push → ECS サービス更新</td>
+</tr>
+</tbody>
+</table>
+<p>ECS コンソール → <code>handson-service</code> → <strong>「タスク」</strong> タブで新しいタスクが起動したら、
+IP を確認してブラウザでアクセスする。</p>
+<hr />
+<h2 id="9">[9] ハンズオン終了後のリソース削除<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>リソース</th>
+<th>削除場所</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ECS サービス</td>
+<td>ECS → <code>handson-cluster</code> → <code>handson-service</code> → 削除</td>
+</tr>
+<tr>
+<td>ECS クラスター</td>
+<td>ECS → <code>handson-cluster</code> → 削除</td>
+</tr>
+<tr>
+<td>タスク定義</td>
+<td>ECS → タスク定義 → <code>handson-task</code> → 登録解除</td>
+</tr>
+<tr>
+<td>ECR リポジトリ</td>
+<td>ECR → <code>handson-app</code> → 削除</td>
+</tr>
+<tr>
+<td>セキュリティグループ</td>
+<td>EC2 → セキュリティグループ → <code>handson-ecs-sg</code> → 削除</td>
+</tr>
+<tr>
+<td>IAM ロール</td>
+<td>IAM → <code>handson-ecs-task-execution-role</code> → 削除</td>
+</tr>
+<tr>
+<td>CloudWatch ロググループ</td>
+<td>CloudWatch → <code>/ecs/handson-task</code> → 削除</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_8">コスト目安<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>リソース</th>
+<th>費用</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fargate（0.5vCPU / 1GB）</td>
+<td>約 $0.025/時間 → <strong>約 $18/月</strong></td>
+<td>起動中は課金される。ハンズオン後は必ず削除すること</td>
+</tr>
+<tr>
+<td>ECR</td>
+<td>$0.10/GB/月</td>
+<td>イメージサイズによるが数十円程度</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ Fargate は EC2 と異なり「停止」という概念がない。
+使い終わったらサービスごと削除すること。</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  ページトップへ戻る
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

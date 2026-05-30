@@ -1,0 +1,2650 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="AWS の主要サービスを段階的に学ぶためのハンズオン手順書">
+      
+      
+      
+        <link rel="canonical" href="https://ohtsuka-shota-se.github.io/samurai-repo/07_CloudFront_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="prev" href="../06_ALB_AutoScaling_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="next" href="../08_CloudWatch_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Phase 7 - CloudFront（CDN） - AWS 学習ハンズオン</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cloudfront-phase-7" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href=".." title="AWS 学習ハンズオン" class="md-header__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AWS 学習ハンズオン
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 7 - CloudFront（CDN）
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="タブ" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  ホーム
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  ハンズオン手順書
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  参考資料
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AWS 学習ハンズオン" class="md-nav__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AWS 学習ハンズオン
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ホーム
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ハンズオン手順書
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ハンズオン手順書
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 - EC2・S3・IAM・VPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_Cognito_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 - Cognito（認証）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03_DynamoDB_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 - DynamoDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_Lambda_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 - Lambda・SNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_Bedrock_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 5 - Bedrock（AI）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_ALB_AutoScaling_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 6 - ALB・Auto Scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 7 - CloudFront（CDN）
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 7 - CloudFront（CDN）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ゴール
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloudfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        今回のテーマ：CloudFront を挟む理由
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloudfront_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CloudFront（クラウドフロント）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ディストリビューション
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        オリジン（Origin）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ビューワープロトコルポリシー
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ssltls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSL/TLS 証明書
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#acmaws-certificate-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACM（AWS Certificate Manager）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wafweb-application-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WAF（Web Application Firewall）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-acl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web ACL（ウェブアクセスコントロールリスト）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-cloudfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] CloudFront ディストリビューションを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1] CloudFront ディストリビューションを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-cloudfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. CloudFront コンソールを開く
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. ディストリビューションを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-3. 作成を完了する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] ブラウザで動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[2] ブラウザで動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-1-cloudfront-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-1. CloudFront の URL を確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-2. ブラウザでアクセスする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認チェックリスト
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        仕組みの説明（学習者向け）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-waf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] （任意）WAF で日本からのアクセスをブロックする（動作確認用）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[3] （任意）WAF で日本からのアクセスをブロックする（動作確認用）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1-us-east-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-1. リージョンを us-east-1（バージニア北部）に切り替える
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2-waf-shield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-2. WAF &amp; Shield コンソールを開く
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-3-web-acl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-3. Web ACL を作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-4. 動作確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-5-or-waf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-5. 動作確認後はルールを無効化 or WAF を削除する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-waf_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] WAF の削除手順
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] （任意）カスタムドメインを設定する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[4] （任意）カスタムドメインを設定する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4-1-acm-ssl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-1. ACM で SSL 証明書を発行する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-2-cloudfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-2. CloudFront にカスタムドメインを設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-3-route-53-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-3. Route 53 に DNS レコードを追加する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        トラブルシューティング
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="トラブルシューティング">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ログインできない・認証エラーが出る
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#504" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ページが表示されない（504 エラー・タイムアウト）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-https" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP から HTTPS にリダイレクトされない
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] ハンズオン終了後のリソース削除
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コスト目安
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08_CloudWatch_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 8 - CloudWatch・SNS（監視）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09_CodeCommit_CICD_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 9 - CodeCommit・CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10_ECS_Fargate_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 10 - ECS/Fargate（コンテナ化）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    参考資料
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    参考資料
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ローカル開発環境のセットアップ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E4%BF%AE%E6%AD%A3%E3%83%BB%E5%A4%89%E6%9B%B4%E5%B1%A5%E6%AD%B4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修正・変更履歴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GitHub%E7%AE%A1%E7%90%86%E6%96%B9%E9%87%9D%E3%81%A8push%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub管理方針
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ゴール
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloudfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        今回のテーマ：CloudFront を挟む理由
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloudfront_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CloudFront（クラウドフロント）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ディストリビューション
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#origin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        オリジン（Origin）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ビューワープロトコルポリシー
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ssltls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSL/TLS 証明書
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#acmaws-certificate-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACM（AWS Certificate Manager）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wafweb-application-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WAF（Web Application Firewall）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#web-acl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web ACL（ウェブアクセスコントロールリスト）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-cloudfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] CloudFront ディストリビューションを作成する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1] CloudFront ディストリビューションを作成する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-cloudfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. CloudFront コンソールを開く
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. ディストリビューションを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-3. 作成を完了する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] ブラウザで動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[2] ブラウザで動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#2-1-cloudfront-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-1. CloudFront の URL を確認する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2-2. ブラウザでアクセスする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認チェックリスト
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        仕組みの説明（学習者向け）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-waf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] （任意）WAF で日本からのアクセスをブロックする（動作確認用）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[3] （任意）WAF で日本からのアクセスをブロックする（動作確認用）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-1-us-east-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-1. リージョンを us-east-1（バージニア北部）に切り替える
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-2-waf-shield" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-2. WAF &amp; Shield コンソールを開く
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-3-web-acl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-3. Web ACL を作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-4. 動作確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-5-or-waf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-5. 動作確認後はルールを無効化 or WAF を削除する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-waf_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] WAF の削除手順
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] （任意）カスタムドメインを設定する
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[4] （任意）カスタムドメインを設定する">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#4-1-acm-ssl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-1. ACM で SSL 証明書を発行する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-2-cloudfront" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-2. CloudFront にカスタムドメインを設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-3-route-53-dns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4-3. Route 53 に DNS レコードを追加する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        トラブルシューティング
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="トラブルシューティング">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ログインできない・認証エラーが出る
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#504" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ページが表示されない（504 エラー・タイムアウト）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-https" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP から HTTPS にリダイレクトされない
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] ハンズオン終了後のリソース削除
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コスト目安
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="cloudfront-phase-7">CloudFront セットアップ手順（Phase 7 ハンズオン）<a class="headerlink" href="#cloudfront-phase-7" title="Permanent link">&para;</a></h1>
+<p>作成日: 2026-05-23</p>
+<p>対象: AWS未経験者向けハンズオン（7回目）</p>
+<hr />
+<h2 id="_1">前提条件<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Phase 7 は Phase 6（ALB + Auto Scaling）の環境が動いていることが前提。
+以下をすべて満たしてからハンズオンを開始すること。</p>
+<table>
+<thead>
+<tr>
+<th>前提条件</th>
+<th>確認方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 6 の CFn スタック（<code>handson-phase6</code>）がデプロイ済み、または手動構築済みであること</td>
+<td>CloudFormation コンソール → <code>handson-phase6</code> のステータスが <code>CREATE_COMPLETE</code></td>
+</tr>
+<tr>
+<td>ALB（<code>handson-alb</code>）が起動していること</td>
+<td>EC2コンソール → ロードバランサー → <code>handson-alb</code> の状態が <code>active</code></td>
+</tr>
+<tr>
+<td>ターゲットグループ（<code>handson-tg</code>）の EC2 が 2 台 <code>healthy</code> になっていること</td>
+<td>EC2コンソール → ターゲットグループ → <code>handson-tg</code> → ターゲットタブ</td>
+</tr>
+<tr>
+<td><code>http://[ALBのDNS名]</code> でアプリにアクセスできること</td>
+<td>ブラウザで ALB の DNS 名を開いてログイン確認</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Phase 6 の環境を CFn で素早く再構築する場合:</strong>
+<code>phase06/cfn/phase6-template-fixed.yaml</code> の値を書き換えてデプロイすれば 5 分程度で整う。
+詳細は <code>docs/06_ALB_AutoScaling_ハンズオン手順.md</code> の「CloudFormation で環境を自動構築・削除する方法」を参照。</p>
+</blockquote>
+<hr />
+<h2 id="_2">完成後イメージ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[ブラウザ]
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓ https://[CloudFrontのドメイン]（または独自ドメイン）
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>[CloudFront: handson-cloudfront]
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓ HTTP → ALB（ポート80）
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>[ALB: handson-alb]
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ├─→ EC2 (ap-northeast-1a)
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    └─→ EC2 (ap-northeast-1c)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>           ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    [DynamoDB / S3(files) / Cognito / Bedrock]（変更なし）
+</code></pre></div>
+<hr />
+<h2 id="_3">環境イメージ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TB
+    User["👤 ユーザー\n（ブラウザ）"]
+
+    subgraph Virginia["us-east-1（バージニア）"]
+        ACM["🔒 ACM 証明書\n（任意・カスタムドメイン時のみ）"]
+        WAF["🛡️ WAF Web ACL\nhandson-webacl\n（任意・攻撃ブロック）"]
+    end
+
+    subgraph Tokyo["ap-northeast-1（東京）"]
+        CF["🌐 CloudFront\nhandson-cloudfront\nHTTPS で受け付け → HTTP で ALB へ転送"]
+        Cognito["🔐 Cognito\nhandson-user-pool"]
+
+        subgraph VPC["VPC: handson-vpc"]
+            ALB["⚖️ ALB: handson-alb\n（ポート80）"]
+            subgraph SubnetA["subnet-1a"]
+                EC2A["EC2\n(AMI起動)\nフロントエンド + API"]
+            end
+            subgraph SubnetC["subnet-1c"]
+                EC2C["EC2\n(AMI起動)\nフロントエンド + API"]
+            end
+            ALB --&gt; EC2A
+            ALB --&gt; EC2C
+        end
+
+        S3["🪣 S3\nhandson-[名前]-files"]
+        DDB["🗄️ DynamoDB\nhandson-reviews"]
+    end
+
+    subgraph Bedrock["us-east-1"]
+        BR["🤖 Bedrock\nNova Micro"]
+    end
+
+    ACM -.-&gt;|証明書アタッチ（任意）| CF
+    WAF -.-&gt;|Web ACL アタッチ（任意）| CF
+    CF --&gt;|HTTP ポート80| ALB
+    EC2A --&gt;|AWS SDK| S3
+    EC2A --&gt;|AWS SDK| DDB
+    EC2A --&gt;|ConverseCommand| BR
+    EC2A --&gt;|JWT検証| Cognito
+    EC2C --&gt;|AWS SDK| S3
+    EC2C --&gt;|AWS SDK| DDB
+
+    User --&gt;|HTTPS| CF
+    User --&gt;|ログイン・JWT取得| Cognito</code></pre>
+<hr />
+<h2 id="_4">ゴール<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Phase 6 まで「ALB のドメインに HTTP でアクセス」していたアプリを、
+CloudFront を前段に置くことで <strong>HTTPS でアクセスできる</strong> ようにする。
+また任意で WAF によるセキュリティ強化・独自ドメインの設定ができる。</p>
+<p>アプリのコード・インフラ（ALB・EC2・ASG）への変更は不要。CloudFront を ALB の前に挟むだけ。</p>
+<hr />
+<h2 id="_5">全体の流れ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[1] CloudFront ディストリビューションを作成する
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    ↓
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>[2] ブラウザで動作確認
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ↓
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>[3] （任意）WAF でセキュリティを強化する
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    ↓
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>[4] （任意）カスタムドメインを設定する
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    ↓
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>[5] （後片付け）リソースを削除する
+</code></pre></div>
+<hr />
+<h2 id="aws">AWS 用語集（手順を始める前に読んでおこう）<a class="headerlink" href="#aws" title="Permanent link">&para;</a></h2>
+<hr />
+<h3 id="cloudfront">今回のテーマ：CloudFront を挟む理由<a class="headerlink" href="#cloudfront" title="Permanent link">&para;</a></h3>
+<p>Phase 6 まではブラウザから ALB に HTTP でアクセスしていた。
+HTTP は通信内容が暗号化されていないため、現代のWebでは推奨されない。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>【Phase 6 まで】
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>ブラウザ → ALB → EC2
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>（HTTP、暗号化なし）
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>【Phase 7 以降】
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>ブラウザ → CloudFront（HTTPS）→ ALB → EC2
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>（HTTPS で暗号化、独自ドメイン対応）
+</code></pre></div>
+<p>CloudFront がブラウザとの通信を HTTPS で受け取り、ALB への転送は内部ネットワークの HTTP で行う。</p>
+<hr />
+<h3 id="cloudfront_1">CloudFront（クラウドフロント）<a class="headerlink" href="#cloudfront_1" title="Permanent link">&para;</a></h3>
+<p>世界中に配置されたサーバー（エッジロケーション）を使ってコンテンツを高速・安全に配信するサービス（CDN）。</p>
+<p>今回使う主な機能:</p>
+<table>
+<thead>
+<tr>
+<th>機能</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HTTPS 対応</strong></td>
+<td>ブラウザとの通信を暗号化する。証明書は CloudFront が管理</td>
+</tr>
+<tr>
+<td><strong>独自ドメイン対応</strong></td>
+<td><code>xxx.cloudfront.net</code> の代わりに自分のドメインを使える</td>
+</tr>
+<tr>
+<td><strong>DDoS 保護</strong></td>
+<td>AWS Shield Standard が自動で有効になる</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="_6">ディストリビューション<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>CloudFront の設定一式のこと。「どこから受け取り、どこへ転送するか」をまとめたもの。
+1つのディストリビューションに複数のオリジン（転送先）やルールを設定できる。</p>
+<hr />
+<h3 id="origin">オリジン（Origin）<a class="headerlink" href="#origin" title="Permanent link">&para;</a></h3>
+<p>CloudFront がリクエストを転送する先のこと。今回は ALB がオリジンになる。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>ブラウザ → CloudFront（フロント） → ALB（オリジン）→ EC2
+</code></pre></div>
+<hr />
+<h3 id="_7">ビューワープロトコルポリシー<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p>ブラウザ（ビューワー）と CloudFront の間の通信方式を決める設定。</p>
+<table>
+<thead>
+<tr>
+<th>設定値</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HTTP と HTTPS を許可</td>
+<td>どちらでもアクセスできる</td>
+</tr>
+<tr>
+<td><strong>Redirect HTTP to HTTPS</strong></td>
+<td>HTTP でアクセスされたら HTTPS に転送（今回はこれ）</td>
+</tr>
+<tr>
+<td>HTTPS のみ</td>
+<td>HTTP を拒否する</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="ssltls">SSL/TLS 証明書<a class="headerlink" href="#ssltls" title="Permanent link">&para;</a></h3>
+<p>HTTPS 通信を可能にするための「身分証明書」のようなもの。
+CloudFront 専用のデフォルト証明書（<code>*.cloudfront.net</code>）が無料で使える。
+独自ドメインを使う場合は ACM（Certificate Manager）で証明書を発行する必要がある。</p>
+<hr />
+<h3 id="acmaws-certificate-manager">ACM（AWS Certificate Manager）<a class="headerlink" href="#acmaws-certificate-manager" title="Permanent link">&para;</a></h3>
+<p>AWS が提供する SSL/TLS 証明書の発行・管理サービス。
+CloudFront に使う証明書は <strong>必ず us-east-1（バージニア北部）で発行する必要がある</strong>。</p>
+<blockquote>
+<p>料金: パブリック証明書の発行・維持は<strong>無料</strong></p>
+</blockquote>
+<hr />
+<h3 id="wafweb-application-firewall">WAF（Web Application Firewall）<a class="headerlink" href="#wafweb-application-firewall" title="Permanent link">&para;</a></h3>
+<p>Web アプリケーションを悪意のある攻撃から守るファイアウォール。
+SQL インジェクション（データベースを不正操作する攻撃）や XSS（クロスサイトスクリプティング）などの
+よく知られた攻撃パターンを検出し、自動的にブロックする。</p>
+<p>CloudFront の前段に設置することで、EC2 や ALB に届く前に悪意のあるリクエストを弾ける。</p>
+<blockquote>
+<p><strong>CloudFront 用 WAF は必ず us-east-1（バージニア北部）で作成する。</strong></p>
+</blockquote>
+<hr />
+<h3 id="web-acl">Web ACL（ウェブアクセスコントロールリスト）<a class="headerlink" href="#web-acl" title="Permanent link">&para;</a></h3>
+<p>WAF の「ルールブック」のこと。
+「このパターンのリクエストはブロックする / 許可する」という判断基準をまとめたもの。
+1 つの Web ACL に複数のルールグループを追加できる。</p>
+<hr />
+<h2 id="1-cloudfront">[1] CloudFront ディストリビューションを作成する<a class="headerlink" href="#1-cloudfront" title="Permanent link">&para;</a></h2>
+<h3 id="1-1-cloudfront">1-1. CloudFront コンソールを開く<a class="headerlink" href="#1-1-cloudfront" title="Permanent link">&para;</a></h3>
+<ol>
+<li>AWSマネジメントコンソール → 「CloudFront」を開く</li>
+<li>リージョンの表示は気にしなくてよい（CloudFront はグローバルサービス）</li>
+</ol>
+<h3 id="1-2">1-2. ディストリビューションを作成する<a class="headerlink" href="#1-2" title="Permanent link">&para;</a></h3>
+<p>「ディストリビューションを作成」をクリックし、以下を設定する。</p>
+<p><strong>オリジンの設定（転送先 = ALB）</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>オリジンドメイン</td>
+<td>Phase 6 で作成した ALB の DNS 名（ドロップダウンから <code>handson-alb-xxx.ap-northeast-1.elb.amazonaws.com</code> を選択）</td>
+</tr>
+<tr>
+<td>プロトコル</td>
+<td>HTTP のみ</td>
+</tr>
+<tr>
+<td>HTTP ポート</td>
+<td>80</td>
+</tr>
+<tr>
+<td>名前</td>
+<td><code>AlbOrigin</code>（自動入力されるが分かりやすい名前に変更してOK）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>「HTTPS プロトコルを使用することを推奨します」という警告が出る場合:</strong>
+ALB は HTTP のみ設定しているため HTTP を選択する。ブラウザとの通信は CloudFront が HTTPS で担当するので問題ない。</p>
+</blockquote>
+<p><strong>デフォルトキャッシュビヘイビアの設定</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ビューワープロトコルポリシー</td>
+<td>Redirect HTTP to HTTPS</td>
+</tr>
+<tr>
+<td>許可された HTTP メソッド</td>
+<td>GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE</td>
+</tr>
+<tr>
+<td>キャッシュポリシー</td>
+<td>CachingDisabled（AWS管理ポリシー）</td>
+</tr>
+<tr>
+<td>オリジンリクエストポリシー</td>
+<td>AllViewer（すべてのヘッダー・Cookie を ALB に転送）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>キャッシュを無効にする理由:</strong>
+API レスポンスとログイン状態（Cookie・JWT）を正しく ALB まで届けるため。</p>
+</blockquote>
+<p><strong>WAF 設定</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>セキュリティ保護を有効</td>
+<td>「セキュリティ保護を有効にしない」を選択</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>ここでは無効にする。WAF を設定したい場合はディストリビューション作成後に [3] で別途設定する。</p>
+</blockquote>
+<p><strong>設定（全般）</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>説明（任意）</td>
+<td><code>handson-cloudfront</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-3">1-3. 作成を完了する<a class="headerlink" href="#1-3" title="Permanent link">&para;</a></h3>
+<p>「ディストリビューションを作成」をクリック。</p>
+<blockquote>
+<p><strong>デプロイには 3〜5 分かかる。</strong> ステータスが「有効」になるまで待つ。</p>
+</blockquote>
+<hr />
+<h2 id="2">[2] ブラウザで動作確認<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<h3 id="2-1-cloudfront-url">2-1. CloudFront の URL を確認する<a class="headerlink" href="#2-1-cloudfront-url" title="Permanent link">&para;</a></h3>
+<ol>
+<li>CloudFront コンソール → ディストリビューションを選択</li>
+<li>「ディストリビューションドメイン名」をコピー（例: <code>dxxxxxxxxxxxxxxx.cloudfront.net</code>）</li>
+</ol>
+<h3 id="2-2">2-2. ブラウザでアクセスする<a class="headerlink" href="#2-2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>https://dxxxxxxxxxxxxxxx.cloudfront.net
+</code></pre></div>
+<p>HTTP でアクセスしても自動で HTTPS にリダイレクトされることを確認する:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>http://dxxxxxxxxxxxxxxx.cloudfront.net
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>↓ 自動リダイレクト
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>https://dxxxxxxxxxxxxxxx.cloudfront.net
+</code></pre></div></p>
+<h3 id="_8">動作確認チェックリスト<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>https://[CloudFrontドメイン]</code> でアプリのトップページが表示される</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> ブラウザのアドレスバーに鍵マーク（🔒）が表示されている</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>http://</code> でアクセスすると <code>https://</code> に自動リダイレクトされる</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> ログインできる（Cognito 認証）</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> レビュー投稿・一覧・AI 分析が正常に動作する</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> S3 ファイル管理が正常に動作する</li>
+</ul>
+<hr />
+<h2 id="_9">仕組みの説明（学習者向け）<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>sequenceDiagram
+    participant B as ブラウザ
+    participant CF as CloudFront
+    participant ALB as ALB
+    participant EC2 as EC2
+
+    B-&gt;&gt;CF: http://dxxx.cloudfront.net/
+    CF--&gt;&gt;B: 301 Redirect → https://dxxx.cloudfront.net/
+    B-&gt;&gt;CF: https://dxxx.cloudfront.net/（HTTPS）
+    Note over CF: HTTPS を終端、HTTP に変換して転送
+    CF-&gt;&gt;ALB: http://handson-alb-xxx.elb.amazonaws.com/（HTTP）
+    ALB-&gt;&gt;EC2: ラウンドロビンで振り分け
+    EC2--&gt;&gt;ALB: HTMLレスポンス
+    ALB--&gt;&gt;CF: HTMLレスポンス
+    CF--&gt;&gt;B: HTMLレスポンス（HTTPS）</code></pre>
+<p><strong>ポイント:</strong>
+- ブラウザと CloudFront の間: <strong>HTTPS</strong>（暗号化あり）
+- CloudFront と ALB の間: <strong>HTTP</strong>（内部ネットワーク、暗号化なし）
+- この構成を「SSL ターミネーション」と呼ぶ。CloudFront が証明書を管理するため EC2 に証明書を設定する必要がない</p>
+<hr />
+<h2 id="3-waf">[3] （任意）WAF で日本からのアクセスをブロックする（動作確認用）<a class="headerlink" href="#3-waf" title="Permanent link">&para;</a></h2>
+<p>CloudFront に WAF（Web Application Firewall）を設定し、<strong>特定の国（ここでは日本）からのアクセスをブロック</strong>する。
+WAF が正しく動作しているかをブラウザで確認できる。確認後は必ず削除すること。</p>
+<blockquote>
+<p><strong>費用目安:</strong> Web ACL $5/月
+ハンズオン終了後は必ず削除すること。</p>
+</blockquote>
+<hr />
+<h3 id="3-1-us-east-1">3-1. リージョンを us-east-1（バージニア北部）に切り替える<a class="headerlink" href="#3-1-us-east-1" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p>CloudFront 用 WAF は必ず <strong>us-east-1</strong> で作成する必要がある。</p>
+</blockquote>
+<ol>
+<li>コンソール右上のリージョンを <strong>「米国東部（バージニア北部）us-east-1」</strong> に切り替える</li>
+</ol>
+<hr />
+<h3 id="3-2-waf-shield">3-2. WAF &amp; Shield コンソールを開く<a class="headerlink" href="#3-2-waf-shield" title="Permanent link">&para;</a></h3>
+<ol>
+<li>「WAF &amp; Shield」を検索して開く</li>
+<li>左メニューから「Web ACLs」を選択</li>
+</ol>
+<hr />
+<h3 id="3-3-web-acl">3-3. Web ACL を作成する<a class="headerlink" href="#3-3-web-acl" title="Permanent link">&para;</a></h3>
+<p>「Web ACL を作成」をクリックし、以下を設定する。</p>
+<p><strong>ステップ 1: 説明と関連付け</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>リソースタイプ</td>
+<td>CloudFront ディストリビューション</td>
+</tr>
+<tr>
+<td>名前</td>
+<td><code>handson-webacl</code></td>
+</tr>
+<tr>
+<td>説明（任意）</td>
+<td><code>handson Phase 7 WAF</code></td>
+</tr>
+</tbody>
+</table>
+<p>「関連付けられた AWS リソース」の「AWS リソースを追加」をクリック:</p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>リソースタイプ</td>
+<td>CloudFront ディストリビューション</td>
+</tr>
+<tr>
+<td>リソース</td>
+<td><code>handson-cloudfront</code>（[1] で作成したディストリビューション）</td>
+</tr>
+</tbody>
+</table>
+<p>「追加」→「次へ」をクリック。</p>
+<hr />
+<p><strong>ステップ 2: ルールを追加する（国別ブロックルールを作成）</strong></p>
+<ol>
+<li>「<strong>自分のルールとルールグループを追加する</strong>」をクリック</li>
+<li>「<strong>ルールを作成</strong>」を選択（マネージドルールグループではないので注意）</li>
+<li>以下を設定する：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ルールタイプ</td>
+<td>「ルールビルダー」を選択</td>
+</tr>
+<tr>
+<td>名前</td>
+<td><code>block-japan</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>「ステートメント（条件）」の設定:</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>検査対象</td>
+<td>「発信元の国」（Originates from a country in）</td>
+</tr>
+<tr>
+<td>国コード</td>
+<td><code>JP</code> を選択（リストから Japan / JP を探す）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>「アクション」の設定:</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>アクション</td>
+<td><strong>ブロック</strong></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「ルールを追加」をクリック → リストに <code>block-japan</code> が追加されたことを確認 → 「次へ」</li>
+</ol>
+<hr />
+<p><strong>ステップ 3〜5: デフォルトのまま進む</strong></p>
+<ul>
+<li>ステップ 3（ルールの優先度）: そのまま「次へ」</li>
+<li>ステップ 4（CloudWatch メトリクス）: そのまま「次へ」</li>
+<li>ステップ 5（確認）: 内容を確認して「Web ACL を作成」をクリック</li>
+</ul>
+<hr />
+<h3 id="3-4">3-4. 動作確認<a class="headerlink" href="#3-4" title="Permanent link">&para;</a></h3>
+<p>Web ACL の作成後、CloudFront ディストリビューションへの反映には数分かかる。</p>
+<p><strong>WAF の関連付けを確認:</strong>
+- WAF コンソール → 「Web ACLs」→ <code>handson-webacl</code> を選択
+- 「関連付けられた AWS リソース」タブ → <code>handson-cloudfront</code> が表示されていれば OK</p>
+<p><strong>ブラウザで WAF が動いているかを確認:</strong></p>
+<p>ブラウザで <code>https://[CloudFrontドメイン]</code> にアクセスする。</p>
+<p>日本のIPからアクセスしているため、以下のエラーが表示されれば <strong>WAF が正常に機能している</strong>。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>403 Forbidden
+</code></pre></div>
+<blockquote>
+<p>CloudFront / WAF が返す 403 画面（英語）が表示される。アプリのログイン画面ではなく、
+シンプルなエラー画面が出ればブロック成功。</p>
+</blockquote>
+<hr />
+<h3 id="3-5-or-waf">3-5. 動作確認後はルールを無効化 or WAF を削除する<a class="headerlink" href="#3-5-or-waf" title="Permanent link">&para;</a></h3>
+<p>ブロックを確認したら、アプリを使えるように戻す。以下のどちらかを選ぶ。</p>
+<p><strong>方法 A: ルールを無効化してアプリを使い続ける（WAF を残したまま）</strong></p>
+<ol>
+<li>WAF コンソール → <code>handson-webacl</code> → 「ルール」タブ</li>
+<li><code>block-japan</code> のトグルを <strong>オフ</strong>（無効）にする</li>
+<li>「保存」をクリック</li>
+<li>数分後にアプリに再アクセスできるようになる</li>
+</ol>
+<p><strong>方法 B: WAF ごと削除する（ハンズオン終了時）</strong></p>
+<p>下記「WAF の削除手順」を参照。</p>
+<hr />
+<h3 id="3-waf_1">[3] WAF の削除手順<a class="headerlink" href="#3-waf_1" title="Permanent link">&para;</a></h3>
+<p>WAF を削除する場合は <strong>CloudFront ディストリビューションとの関連付けを先に解除</strong> する必要がある。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>1. WAF コンソール（us-east-1）→「Web ACLs」→「handson-webacl」を選択
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>2. 「関連付けられた AWS リソース」タブ → handson-cloudfront を選択 →「関連付けの解除」
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>3. 「handson-webacl」を選択 →「削除」
+</code></pre></div>
+<hr />
+<h2 id="4">[4] （任意）カスタムドメインを設定する<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<p>独自ドメイン（例: <code>handson.example.com</code>）でアクセスできるようにする。
+<strong>Route 53 でドメインを管理していることが前提。</strong></p>
+<h3 id="4-1-acm-ssl">4-1. ACM で SSL 証明書を発行する<a class="headerlink" href="#4-1-acm-ssl" title="Permanent link">&para;</a></h3>
+<blockquote>
+<p><strong>必ず <code>us-east-1</code>（バージニア北部）で作業すること。</strong>
+CloudFront に使う証明書は us-east-1 でしか利用できない。</p>
+</blockquote>
+<ol>
+<li>コンソール右上のリージョンを <strong>「米国東部（バージニア北部）us-east-1」</strong> に切り替える</li>
+<li>「Certificate Manager（ACM）」を開く</li>
+<li>「証明書をリクエスト」→「パブリック証明書」→「次へ」</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ドメイン名</td>
+<td>自分のドメイン（例: <code>handson.example.com</code>）</td>
+</tr>
+<tr>
+<td>検証方法</td>
+<td>DNS 検証</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「リクエスト」をクリック</li>
+<li>証明書一覧から作成した証明書を選択 → 「Route 53 でレコードを作成」→「レコードを作成」</li>
+</ol>
+<blockquote>
+<p>Route 53 に確認用の CNAME レコードが自動で追加される。
+数分〜数十分後に証明書のステータスが「<strong>発行済み</strong>」になる。</p>
+</blockquote>
+<h3 id="4-2-cloudfront">4-2. CloudFront にカスタムドメインを設定する<a class="headerlink" href="#4-2-cloudfront" title="Permanent link">&para;</a></h3>
+<p>リージョンを<strong>東京（ap-northeast-1）</strong>に戻す。</p>
+<ol>
+<li>CloudFront コンソール → ディストリビューションを選択 → 「全般」タブ → 「編集」</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>代替ドメイン名（CNAME）</td>
+<td><code>handson.example.com</code></td>
+</tr>
+<tr>
+<td>カスタム SSL 証明書</td>
+<td>[3-1] で発行した証明書を選択</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「変更を保存」をクリック（デプロイに数分かかる）</li>
+</ol>
+<h3 id="4-3-route-53-dns">4-3. Route 53 に DNS レコードを追加する<a class="headerlink" href="#4-3-route-53-dns" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Route 53 コンソール → 「ホストゾーン」→ 自分のドメインを選択</li>
+<li>「レコードを作成」</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>レコード名</td>
+<td><code>handson</code>（<code>handson.example.com</code> の場合）</td>
+</tr>
+<tr>
+<td>レコードタイプ</td>
+<td>A</td>
+</tr>
+<tr>
+<td>エイリアス</td>
+<td>オン</td>
+</tr>
+<tr>
+<td>トラフィックのルーティング先</td>
+<td>「CloudFront ディストリビューションへのエイリアス」→ ディストリビューションを選択</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「レコードを作成」をクリック</li>
+<li>数分後に <code>https://handson.example.com</code> でアクセスできるようになる</li>
+</ol>
+<hr />
+<h2 id="_10">トラブルシューティング<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<h3 id="_11">ログインできない・認証エラーが出る<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h3>
+<p>JWT の検証が Cognito に対して行われるが、Cognito が別ドメインからのアクセスを想定していない場合がある。</p>
+<p><strong>確認:</strong> Cognito コンソール → ユーザープール → アプリクライアント → コールバック URL に CloudFront のドメインが含まれているか確認する。</p>
+<p>含まれていない場合:
+- Cognito → アプリクライアントの設定 → コールバック URL に <code>https://[CloudFrontドメイン]/</code> を追加する</p>
+<h3 id="504">ページが表示されない（504 エラー・タイムアウト）<a class="headerlink" href="#504" title="Permanent link">&para;</a></h3>
+<p>CloudFront から ALB への接続がタイムアウトしている可能性がある。</p>
+<p><strong>確認 1:</strong> ALB が正常に動作しているか
+- Phase 6 の手順書を参照し、ターゲットグループのヘルスチェックが <code>healthy</code> か確認</p>
+<p><strong>確認 2:</strong> CloudFront のオリジン設定
+- CloudFront → ディストリビューション → オリジン → ALB のドメイン名・ポート（80）が正しいか確認</p>
+<h3 id="http-https">HTTP から HTTPS にリダイレクトされない<a class="headerlink" href="#http-https" title="Permanent link">&para;</a></h3>
+<p>ビヘイビアの「ビューワープロトコルポリシー」が「Redirect HTTP to HTTPS」になっているか確認する。
+- CloudFront → ディストリビューション → ビヘイビア → デフォルト（<code>*</code>）を編集</p>
+<hr />
+<h2 id="5">[5] ハンズオン終了後のリソース削除<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<p>CloudFront は<strong>リクエスト課金</strong>のためほとんど費用はかからないが、
+WAF は月額固定費用がかかるため、ハンズオン終了後は必ず削除すること。
+以下の順番で削除する。</p>
+<p><strong>削除順序:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>1. WAF の関連付けを解除（WAF を設定した場合）
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>   → WAF コンソール（us-east-1）→「Web ACLs」→「handson-webacl」
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>   →「関連付けられた AWS リソース」タブ → handson-cloudfront を選択 →「関連付けの解除」
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>2. WAF Web ACL を削除（WAF を設定した場合）
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>   → 「handson-webacl」を選択 →「削除」
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>   ※ 先に関連付けを解除しないと削除できない
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>3. CloudFront ディストリビューションを無効化
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>   → ディストリビューション選択 →「無効にする」→「変更を保存」
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>   ※ 無効化には数分かかる
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>4. ディストリビューションを削除
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>   → ステータスが「無効」になってから「削除」をクリック
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>5. Route 53 レコードを削除（カスタムドメインを設定した場合）
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>6. ACM 証明書を削除（カスタムドメインを設定した場合）
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>   → us-east-1 の ACM コンソールで削除
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
+<a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>7. Phase 6 のリソース（ALB・ASG など）を削除
+<a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a>   → 06_ALB_AutoScaling_ハンズオン手順.md の [9] を参照
+</code></pre></div>
+<hr />
+<h2 id="_12">コスト目安<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>リソース</th>
+<th>費用</th>
+<th>備考</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CloudFront</td>
+<td>無料枠：1TB/月のデータ転送・1,000万リクエスト/月</td>
+<td>ハンズオン程度なら $0</td>
+</tr>
+<tr>
+<td>ACM 証明書</td>
+<td><strong>無料</strong></td>
+<td>パブリック証明書の発行・維持費用なし</td>
+</tr>
+<tr>
+<td>Route 53 レコード</td>
+<td>$0.50/月（ホストゾーン） + クエリ費用</td>
+<td>ドメインを Route 53 で管理している場合のみ</td>
+</tr>
+<tr>
+<td>WAF Web ACL</td>
+<td><strong>$5/月</strong></td>
+<td>Web ACL 1 つにつき固定。<strong>ハンズオン後は削除すること</strong></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  ページトップへ戻る
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

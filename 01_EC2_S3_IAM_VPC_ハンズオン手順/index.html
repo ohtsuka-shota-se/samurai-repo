@@ -1,0 +1,4141 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="AWS の主要サービスを段階的に学ぶためのハンズオン手順書">
+      
+      
+      
+        <link rel="canonical" href="https://ohtsuka-shota-se.github.io/samurai-repo/01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../02_Cognito_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Phase 1 - EC2・S3・IAM・VPC - AWS 学習ハンズオン</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#ec2s3iam-phase-1" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href=".." title="AWS 学習ハンズオン" class="md-header__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AWS 学習ハンズオン
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 1 - EC2・S3・IAM・VPC
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="タブ" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  ホーム
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  ハンズオン手順書
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  参考資料
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AWS 学習ハンズオン" class="md-nav__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AWS 学習ハンズオン
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ホーム
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ハンズオン手順書
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ハンズオン手順書
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 - EC2・S3・IAM・VPC
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 - EC2・S3・IAM・VPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ゴール
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS全般
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS全般">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWSマネジメントコンソール
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        リージョン
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#az" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        アベイラビリティゾーン（AZ）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#free-tier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        無料利用枠（Free Tier）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vpcvirtual-private-cloud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VPC（Virtual Private Cloud）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="VPC（Virtual Private Cloud）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vpc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VPC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cidr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CIDR（サイダー）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        サブネット（Subnet）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#igw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        インターネットゲートウェイ（IGW）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ルートテーブル
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec2elastic-compute-cloud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC2（Elastic Compute Cloud）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EC2（Elastic Compute Cloud）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        インスタンス
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amiamazon-machine-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AMI（Amazon Machine Image）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        インスタンスタイプ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        キーペア（.pem ファイル）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sshsecure-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSH（Secure Shell）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        セキュリティグループ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        パブリックIPアドレス
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ebselastic-block-store" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EBS（Elastic Block Store）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s3simple-storage-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3（Simple Storage Service）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S3（Simple Storage Service）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        バケット
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        オブジェクト
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        オブジェクトキー
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        パブリックアクセスのブロック
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iamidentity-and-access-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM（Identity and Access Management）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IAM（Identity and Access Management）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ポリシー
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iam_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAMロール
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        アタッチ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iamec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAMロールをEC2にアタッチする仕組み
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コード用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="コード用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web・通信の基礎
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web・通信の基礎">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        フロントエンド / バックエンド
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-https" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP / HTTPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ポート（Port）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rest-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jsonjavascript-object-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON（JavaScript Object Notation）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs-npm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js / npm
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Node.js / npm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#npmnode-package-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        npm（Node Package Manager）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packagejson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        package.json
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node_modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        node_modules/
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#env" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .env ファイル
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#typescript" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TypeScript / ビルド
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TypeScript / ビルド">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#typescript_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TypeScript
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ビルド（コンパイル）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dist/ フォルダ
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#express" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Express（バックエンドフレームワーク）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Express（バックエンドフレームワーク）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#express_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Express
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        エンドポイント
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#react-vite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        React / Vite（フロントエンド）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="React / Vite（フロントエンド）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#react" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        React
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vite（ヴィート）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spasingle-page-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPA（Single Page Application）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git / GitHub
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git / GitHub">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#git" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        git clone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        git pull
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aws-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS SDK
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS SDK">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-sdksoftware-development-kit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS SDK（Software Development Kit）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-vpc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] VPC作成
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1] VPC作成">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-vpc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. VPCを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. インターネットゲートウェイを作成してアタッチする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-3. パブリックサブネットを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-4. ルートテーブルを作成してサブネットに関連付ける
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] S3バケット作成
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] IAMロール作成
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] EC2インスタンス起動
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-ec2sshnodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] EC2にSSH接続・Node.jsセットアップ
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[5] EC2にSSH接続・Node.jsセットアップ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSHの接続
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.jsのインストール
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [6] アプリのクローン・ビルド・起動
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[6] アプリのクローン・ビルド・起動">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-1. リポジトリをクローンする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-2. フロントエンドをビルドする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-3. バックエンドをセットアップする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-4-s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-4. S3バケット名を設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-5. ビルドして起動する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [7] ブラウザで動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[7] ブラウザで動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認チェックリスト
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        トラブルシューティング
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="トラブルシューティング">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        画面が表示されない場合
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        「ファイル一覧の取得に失敗しました」と表示される場合
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ハンズオン終了時の注意（費用発生を防ぐため）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_Cognito_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 - Cognito（認証）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03_DynamoDB_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 - DynamoDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_Lambda_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 - Lambda・SNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_Bedrock_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 5 - Bedrock（AI）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_ALB_AutoScaling_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 6 - ALB・Auto Scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07_CloudFront_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 7 - CloudFront（CDN）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../08_CloudWatch_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 8 - CloudWatch・SNS（監視）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09_CodeCommit_CICD_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 9 - CodeCommit・CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10_ECS_Fargate_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 10 - ECS/Fargate（コンテナ化）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    参考資料
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    参考資料
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ローカル開発環境のセットアップ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E4%BF%AE%E6%AD%A3%E3%83%BB%E5%A4%89%E6%9B%B4%E5%B1%A5%E6%AD%B4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修正・変更履歴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GitHub%E7%AE%A1%E7%90%86%E6%96%B9%E9%87%9D%E3%81%A8push%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub管理方針
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ゴール
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        全体の流れ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS 用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS 用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS全般
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS全般">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWSマネジメントコンソール
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        リージョン
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#az" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        アベイラビリティゾーン（AZ）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#free-tier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        無料利用枠（Free Tier）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vpcvirtual-private-cloud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VPC（Virtual Private Cloud）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="VPC（Virtual Private Cloud）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vpc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VPC
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cidr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CIDR（サイダー）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        サブネット（Subnet）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#igw" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        インターネットゲートウェイ（IGW）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ルートテーブル
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ec2elastic-compute-cloud" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC2（Elastic Compute Cloud）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EC2（Elastic Compute Cloud）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EC2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        インスタンス
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#amiamazon-machine-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AMI（Amazon Machine Image）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        インスタンスタイプ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        キーペア（.pem ファイル）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sshsecure-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSH（Secure Shell）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        セキュリティグループ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        パブリックIPアドレス
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ebselastic-block-store" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EBS（Elastic Block Store）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s3simple-storage-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3（Simple Storage Service）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S3（Simple Storage Service）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        バケット
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        オブジェクト
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        オブジェクトキー
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        パブリックアクセスのブロック
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iamidentity-and-access-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM（Identity and Access Management）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="IAM（Identity and Access Management）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ポリシー
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iam_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAMロール
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        アタッチ
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iamec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAMロールをEC2にアタッチする仕組み
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        コード用語集（手順を始める前に読んでおこう）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="コード用語集（手順を始める前に読んでおこう）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#web" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Web・通信の基礎
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Web・通信の基礎">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        フロントエンド / バックエンド
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-https" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP / HTTPS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#port" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ポート（Port）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rest-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        REST API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jsonjavascript-object-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON（JavaScript Object Notation）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs-npm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js / npm
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Node.js / npm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#nodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#npmnode-package-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        npm（Node Package Manager）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#packagejson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        package.json
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node_modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        node_modules/
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#env" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        .env ファイル
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#typescript" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TypeScript / ビルド
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TypeScript / ビルド">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#typescript_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TypeScript
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ビルド（コンパイル）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dist/ フォルダ
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#express" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Express（バックエンドフレームワーク）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Express（バックエンドフレームワーク）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#express_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Express
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        エンドポイント
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#react-vite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        React / Vite（フロントエンド）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="React / Vite（フロントエンド）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#react" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        React
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Vite（ヴィート）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spasingle-page-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SPA（Single Page Application）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git / GitHub
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Git / GitHub">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#git" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Git
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#github" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GitHub
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        git clone
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#git-pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        git pull
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aws-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS SDK
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS SDK">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-sdksoftware-development-kit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AWS SDK（Software Development Kit）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-vpc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [1] VPC作成
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[1] VPC作成">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-1-vpc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-1. VPCを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-2. インターネットゲートウェイを作成してアタッチする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-3. パブリックサブネットを作成する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1-4. ルートテーブルを作成してサブネットに関連付ける
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [2] S3バケット作成
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-iam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [3] IAMロール作成
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-ec2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [4] EC2インスタンス起動
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-ec2sshnodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [5] EC2にSSH接続・Node.jsセットアップ
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[5] EC2にSSH接続・Node.jsセットアップ">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SSHの接続
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.jsのインストール
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [6] アプリのクローン・ビルド・起動
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[6] アプリのクローン・ビルド・起動">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-1. リポジトリをクローンする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-2. フロントエンドをビルドする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-3. バックエンドをセットアップする
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-4-s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-4. S3バケット名を設定する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5-5. ビルドして起動する
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        [7] ブラウザで動作確認
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="[7] ブラウザで動作確認">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        動作確認チェックリスト
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        トラブルシューティング
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="トラブルシューティング">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        画面が表示されない場合
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        「ファイル一覧の取得に失敗しました」と表示される場合
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ハンズオン終了時の注意（費用発生を防ぐため）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="ec2s3iam-phase-1">EC2・S3・IAM セットアップ手順（Phase 1 ハンズオン）<a class="headerlink" href="#ec2s3iam-phase-1" title="Permanent link">&para;</a></h1>
+<p>作成日: 2026-05-09
+更新日: 2026-05-09（AWS用語集を追加）</p>
+<p>対象: AWS未経験者向けハンズオン（1回目）</p>
+<hr />
+<h2 id="_1">完成後イメージ<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><img alt="" src="../images/phase01-%E5%AE%8C%E6%88%90%E5%BE%8C%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8.png" /></p>
+<h2 id="_2">環境イメージ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TB
+    User["👤 ユーザー\n（ブラウザ）"]
+
+    subgraph AWS["AWS クラウド (ap-northeast-1)"]
+        IGW["🌐 インターネットゲートウェイ\nhandson-igw"]
+
+        subgraph VPC["VPC: handson-vpc (10.0.0.0/16)"]
+            subgraph Subnet["パブリックサブネット: handson-public-subnet\n10.0.0.0/24  /  ap-northeast-1a"]
+                subgraph EC2Box["EC2インスタンス (Ubuntu 24.04 / t2.micro)"]
+                    FE["React フロントエンド\n(ビルド済み静的ファイル)"]
+                    BE["Node.js + Express バックエンド\n(ポート 3000)"]
+                    FE --&gt;|"画面操作 → APIリクエスト"| BE
+                end
+            end
+            RT["ルートテーブル\n0.0.0.0/0 → IGW"]
+        end
+
+        IAM["IAMロール\nhandson-ec2-role\n(AmazonS3FullAccess)"]
+        S3["🪣 S3 バケット\nhandson-[名前]-files"]
+
+        RT -.- Subnet
+        IAM -.-&gt;|アタッチ\n認証情報を自動提供| EC2Box
+        BE --&gt;|"AWS SDK v3\nファイルの読み書き"| S3
+    end
+
+    User --&gt;|"HTTP :3000"| IGW
+    IGW --&gt; Subnet</code></pre>
+<p><img alt="アーキテクチャ図" src="../images/architecture.png" /></p>
+<h2 id="_3">ゴール<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>S3バケットにファイルをアップロード・一覧表示・ダウンロード・削除できるWebアプリをEC2上で動かす。</p>
+<h2 id="_4">全体の流れ<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>[1] VPC作成（ネットワーク環境の準備）
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>[2] S3バケット作成
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>[3] IAMロール作成（EC2がS3にアクセスできる権限）
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>[4] EC2インスタンス起動（VPC内に配置・IAMロールをアタッチ）
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>[5] EC2にSSH接続・Node.jsセットアップ
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>[6] GitHubからアプリをクローン・ビルド・起動
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    ↓
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>[7] ブラウザで動作確認
+</code></pre></div>
+<hr />
+<h2 id="aws">AWS 用語集（手順を始める前に読んでおこう）<a class="headerlink" href="#aws" title="Permanent link">&para;</a></h2>
+<p>手順中に出てくる言葉を事前に把握しておくと、何をやっているのかが理解しやすくなる。</p>
+<hr />
+<h3 id="aws_1">AWS全般<a class="headerlink" href="#aws_1" title="Permanent link">&para;</a></h3>
+<h4 id="aws_2">AWSマネジメントコンソール<a class="headerlink" href="#aws_2" title="Permanent link">&para;</a></h4>
+<p>ブラウザ上で AWS のサービスを操作する管理画面。
+EC2・S3・IAM はすべてここから設定する。
+URL: https://console.aws.amazon.com/</p>
+<h4 id="_5">リージョン<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<p>AWS のデータセンターが集まっている地理的な場所。
+「東京リージョン（ap-northeast-1）」「大阪リージョン（ap-northeast-3）」などがある。
+<strong>作ったリソース（EC2・S3など）はリージョンをまたいでは見えない。</strong>
+コンソール右上で選択できるので、作業前に「東京」になっているか確認する習慣をつけること。</p>
+<h4 id="az">アベイラビリティゾーン（AZ）<a class="headerlink" href="#az" title="Permanent link">&para;</a></h4>
+<p>リージョンの中にある個別のデータセンター群。東京リージョンには <code>ap-northeast-1a</code>〜<code>1d</code> がある。
+1つのAZが障害になっても他のAZは動き続ける設計になっている。
+Phase 1 では意識しなくてよいが、後のフェーズで出てくる。</p>
+<h4 id="free-tier">無料利用枠（Free Tier）<a class="headerlink" href="#free-tier" title="Permanent link">&para;</a></h4>
+<p>AWS に新規登録してから12か月間、一定の利用量まで無料で使える枠。
+<code>t2.micro</code> のEC2は月750時間まで無料。S3は5GBまで無料。
+<strong>ただし停止し忘れると無料枠を超えて課金されることがあるため注意。</strong></p>
+<hr />
+<h3 id="vpcvirtual-private-cloud">VPC（Virtual Private Cloud）<a class="headerlink" href="#vpcvirtual-private-cloud" title="Permanent link">&para;</a></h3>
+<h4 id="vpc">VPC<a class="headerlink" href="#vpc" title="Permanent link">&para;</a></h4>
+<p>AWS上に作る「自分専用のプライベートネットワーク」。
+EC2などのリソースはこのVPCの中に配置する。
+自分のオフィスにLANを引くようなイメージ。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>インターネット
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    ↓
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>インターネットゲートウェイ（出入口）
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ↓
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>VPC（自分専用ネットワーク）
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    └─ サブネット（部屋）
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>           └─ EC2（サーバー）
+</code></pre></div>
+<p>今回は以下の構成で作成する:</p>
+<table>
+<thead>
+<tr>
+<th>リソース</th>
+<th>名前</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPC</td>
+<td>handson-vpc</td>
+<td>CIDR: 10.0.0.0/16</td>
+</tr>
+<tr>
+<td>サブネット</td>
+<td>handson-public-subnet</td>
+<td>CIDR: 10.0.0.0/24 / AZ: ap-northeast-1a</td>
+</tr>
+<tr>
+<td>インターネットゲートウェイ</td>
+<td>handson-igw</td>
+<td>VPCにアタッチ</td>
+</tr>
+<tr>
+<td>ルートテーブル</td>
+<td>handson-public-rt</td>
+<td>0.0.0.0/0 → handson-igw</td>
+</tr>
+</tbody>
+</table>
+<h4 id="cidr">CIDR（サイダー）<a class="headerlink" href="#cidr" title="Permanent link">&para;</a></h4>
+<p>ネットワークの範囲を表す記法。<code>10.0.0.0/16</code> の <code>/16</code> が「何ビット分をネットワーク部に使うか」を示す。
+数字が小さいほどIPアドレスの範囲が広くなる。</p>
+<table>
+<thead>
+<tr>
+<th>CIDR</th>
+<th>使えるIPアドレス数</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/16</td>
+<td>約65,000個</td>
+<td>VPC全体（広め）</td>
+</tr>
+<tr>
+<td>/24</td>
+<td>256個</td>
+<td>サブネット（今回はこれ）</td>
+</tr>
+</tbody>
+</table>
+<p>難しく考えなくてよい。今回は <code>VPC=10.0.0.0/16</code>、<code>サブネット=10.0.0.0/24</code> と覚えておけばOK。</p>
+<h4 id="subnet">サブネット（Subnet）<a class="headerlink" href="#subnet" title="Permanent link">&para;</a></h4>
+<p>VPCをさらに分割した「部屋」。
+- <strong>パブリックサブネット</strong>: インターネットと通信できる。EC2をここに置く
+- <strong>プライベートサブネット</strong>: インターネットと直接通信できない。DBサーバーなどを置く</p>
+<p>今回はパブリックサブネット1つだけ作成する。</p>
+<h4 id="igw">インターネットゲートウェイ（IGW）<a class="headerlink" href="#igw" title="Permanent link">&para;</a></h4>
+<p>VPCとインターネットをつなぐ「出入口」。
+これをVPCにアタッチしないと、EC2はインターネットと通信できない。</p>
+<h4 id="_6">ルートテーブル<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
+<p>「このIPアドレス宛の通信はどこに送るか」を定義した経路表。
+<code>0.0.0.0/0 → handson-igw</code> という設定は「インターネット宛の通信はIGWへ送る」という意味。
+サブネットに関連付けることで効果を発揮する。</p>
+<hr />
+<h3 id="ec2elastic-compute-cloud">EC2（Elastic Compute Cloud）<a class="headerlink" href="#ec2elastic-compute-cloud" title="Permanent link">&para;</a></h3>
+<h4 id="ec2">EC2<a class="headerlink" href="#ec2" title="Permanent link">&para;</a></h4>
+<p>AWS が提供する仮想サーバー。
+「クラウド上に自分専用のパソコンを借りる」イメージ。
+今回はこのサーバー上で Node.js アプリを動かす。</p>
+<h4 id="_7">インスタンス<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
+<p>EC2の仮想サーバー1台のこと。
+「EC2インスタンスを起動する」＝「仮想サーバーを1台立ち上げる」という意味。</p>
+<h4 id="amiamazon-machine-image">AMI（Amazon Machine Image）<a class="headerlink" href="#amiamazon-machine-image" title="Permanent link">&para;</a></h4>
+<p>インスタンスを起動するときのOS設定の雛形。
+今回は <code>Ubuntu Server 24.04 LTS</code> を使う。
+「Windowsをインストールするか、Ubuntuをインストールするか」をここで選ぶイメージ。</p>
+<h4 id="_8">インスタンスタイプ<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h4>
+<p>仮想サーバーのスペック（CPU・メモリの大きさ）のこと。
+<code>t2.micro</code> は vCPU 1・メモリ 1GB の最小クラス。無料利用枠の対象。
+大きなアプリを動かすときは <code>t3.medium</code> などより大きなタイプを選ぶ。</p>
+<h4 id="pem">キーペア（.pem ファイル）<a class="headerlink" href="#pem" title="Permanent link">&para;</a></h4>
+<p>SSH 接続するための「カギ」。公開鍵（AWSが保持）と秘密鍵（.pem ファイルとして自分がダウンロード）がセット。
+<strong>一度しかダウンロードできないので、大切に保管すること。紛失すると SSH できなくなる。</strong></p>
+<h4 id="sshsecure-shell">SSH（Secure Shell）<a class="headerlink" href="#sshsecure-shell" title="Permanent link">&para;</a></h4>
+<p>ネットワーク越しにサーバーを安全に操作するためのプロトコル。
+ターミナルから <code>ssh -i キーファイル ubuntu@IPアドレス</code> と打つと、EC2のターミナルを自分のPCから操作できる。</p>
+<h4 id="_9">セキュリティグループ<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h4>
+<p>EC2への「ネットワーク入口の門番」。
+どのIPアドレスからどのポートへの通信を許可するか・拒否するかを設定する。
+今回は SSH（22番）と アプリ（3000番）のみ開放する。</p>
+<table>
+<thead>
+<tr>
+<th>ポート番号</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>22</td>
+<td>SSH接続（サーバー操作）</td>
+</tr>
+<tr>
+<td>80</td>
+<td>HTTP（Webブラウザ）</td>
+</tr>
+<tr>
+<td>443</td>
+<td>HTTPS（暗号化されたWeb）</td>
+</tr>
+<tr>
+<td>3000</td>
+<td>今回のアプリ</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ip">パブリックIPアドレス<a class="headerlink" href="#ip" title="Permanent link">&para;</a></h4>
+<p>インターネットから EC2 に接続するためのIPアドレス。
+<code>http://[パブリックIP]:3000</code> でアプリにアクセスできる。
+<strong>EC2を停止→起動するたびにIPアドレスが変わる点に注意。</strong></p>
+<h4 id="ebselastic-block-store">EBS（Elastic Block Store）<a class="headerlink" href="#ebselastic-block-store" title="Permanent link">&para;</a></h4>
+<p>EC2 にアタッチされる仮想ハードディスク。
+EC2 を停止してもデータは消えないが、EC2 を「終了（削除）」するとデータも消える。</p>
+<hr />
+<h3 id="s3simple-storage-service">S3（Simple Storage Service）<a class="headerlink" href="#s3simple-storage-service" title="Permanent link">&para;</a></h3>
+<h4 id="s3">S3<a class="headerlink" href="#s3" title="Permanent link">&para;</a></h4>
+<p>AWS のオブジェクトストレージサービス。
+ファイルをインターネット越しに保存・取得できる「クラウド上のハードディスク」のようなもの。
+容量上限がなく、画像・動画・バックアップなど何でも保存できる。</p>
+<h4 id="_10">バケット<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h4>
+<p>S3 の中のファイルを入れる「箱（フォルダのようなもの）」。
+名前は <strong>全世界でユニーク</strong>（同じ名前のバケットは地球上に1つしか作れない）。
+リージョンごとに作成するが、バケット名は全世界共通の名前空間。</p>
+<h4 id="_11">オブジェクト<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h4>
+<p>S3 に保存されたファイル1件のこと。
+ファイル本体（データ）＋メタデータ（更新日時・サイズ・ContentTypeなど）をまとめて「オブジェクト」と呼ぶ。</p>
+<h4 id="_12">オブジェクトキー<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h4>
+<p>S3 内でオブジェクトを識別する「ファイルパス」のようなもの。
+例: <code>documents/report.pdf</code> というキーで保存すると、フォルダ階層があるように見える（実際にはフォルダは存在せず、スラッシュを含む文字列）。</p>
+<h4 id="_13">パブリックアクセスのブロック<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h4>
+<p>S3 バケットをインターネットに公開するかどうかの設定。
+今回は <strong>オン（ブロックする）</strong> にする。EC2 経由でアクセスするため、S3 を直接公開する必要がない。
+うっかりオフにすると個人情報などが誰でも見られる状態になるため注意。</p>
+<hr />
+<h3 id="iamidentity-and-access-management">IAM（Identity and Access Management）<a class="headerlink" href="#iamidentity-and-access-management" title="Permanent link">&para;</a></h3>
+<h4 id="iam">IAM<a class="headerlink" href="#iam" title="Permanent link">&para;</a></h4>
+<p>AWS リソースへのアクセス権限を管理するサービス。
+「誰が」「何を」「どのくらい」できるかを細かく制御できる。</p>
+<h4 id="_14">ポリシー<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h4>
+<p>「何ができるか（権限の内容）」を JSON で定義したもの。
+例: <code>AmazonS3FullAccess</code> → S3 の全操作（読み書き削除）を許可するポリシー。
+AWS があらかじめ用意した「管理ポリシー」と、自分で細かく書く「カスタムポリシー」がある。</p>
+<blockquote>
+<p><strong>本番環境では最小権限の原則を守ること。</strong>
+「S3の読み取りだけできれば良い」ならば <code>AmazonS3ReadOnlyAccess</code> を使う。
+ハンズオンでは学習のため <code>FullAccess</code> を使うが、本番では必要最小限にする。</p>
+</blockquote>
+<h4 id="iam_1">IAMロール<a class="headerlink" href="#iam_1" title="Permanent link">&para;</a></h4>
+<p>「AWS サービス自身に渡す権限のセット」。
+人間のユーザーではなく、EC2・Lambda などの <strong>サービスが使う</strong> ための権限証明書。
+今回は EC2 に S3 へのアクセス権限を与えるために <code>handson-ec2-role</code> というロールを作り、EC2 にアタッチする。</p>
+<h4 id="_15">アタッチ<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h4>
+<p>ポリシーをロールに紐付けたり、ロールをEC2に紐付けたりすること。
+「権限を渡す」行為のこと。</p>
+<h4 id="iamec2">IAMロールをEC2にアタッチする仕組み<a class="headerlink" href="#iamec2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>IAMロール（handson-ec2-role）
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    └── ポリシー: AmazonS3FullAccess がアタッチされている
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>          ↓
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    EC2インスタンスに紐付ける
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>          ↓
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    EC2上で動くアプリが自動的に S3 への権限を得る
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    （アクセスキーの設定が不要になる）
+</code></pre></div>
+<hr />
+<h2 id="_16">コード用語集（手順を始める前に読んでおこう）<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h2>
+<p>アプリのセットアップ手順（[4]〜[5]）で使う言葉を解説する。</p>
+<hr />
+<h3 id="web">Web・通信の基礎<a class="headerlink" href="#web" title="Permanent link">&para;</a></h3>
+<h4 id="_17">フロントエンド / バックエンド<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[ブラウザ] ←→ [フロントエンド] ←→ [バックエンド] ←→ [S3]
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  ユーザーが        画面の表示          データ処理・        ファイル
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  見る部分          HTML/CSS/JS         API の提供          保存先
+</code></pre></div>
+<ul>
+<li><strong>フロントエンド</strong>: ブラウザ上で動くUI部分。今回は React（JavaScript）で書かれている</li>
+<li><strong>バックエンド</strong>: サーバー上で動くプログラム。今回は Node.js + Express で書かれている。S3への実際の操作はここが行う</li>
+</ul>
+<h4 id="http-https">HTTP / HTTPS<a class="headerlink" href="#http-https" title="Permanent link">&para;</a></h4>
+<p>ブラウザとサーバーがデータをやり取りするための通信ルール（プロトコル）。
+- <code>http://</code> は暗号化なし。今回のハンズオンはこちら
+- <code>https://</code> は暗号化あり。本番環境では必須</p>
+<p>ブラウザで <code>http://[EC2のIP]:3000</code> にアクセスすると、EC2のサーバーへ HTTP リクエストが飛ぶ。</p>
+<h4 id="port">ポート（Port）<a class="headerlink" href="#port" title="Permanent link">&para;</a></h4>
+<p>1台のサーバーが複数のサービスを同時に動かすときの「窓口番号」。
+<code>http://192.168.1.1:3000</code> の <code>:3000</code> がポート番号。</p>
+<table>
+<thead>
+<tr>
+<th>ポート</th>
+<th>使われ方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>80</td>
+<td>通常の Web（http://）</td>
+</tr>
+<tr>
+<td>443</td>
+<td>暗号化された Web（https://）</td>
+</tr>
+<tr>
+<td>22</td>
+<td>SSH（サーバー操作）</td>
+</tr>
+<tr>
+<td>3000</td>
+<td>今回のアプリ（開発用によく使われる番号）</td>
+</tr>
+</tbody>
+</table>
+<h4 id="rest-api">REST API<a class="headerlink" href="#rest-api" title="Permanent link">&para;</a></h4>
+<p>フロントエンドとバックエンドがデータをやり取りするときの取り決め。
+URL と HTTP メソッドの組み合わせで「何をしたいか」を表現する。</p>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>意味</th>
+<th>今回の使われ方</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>取得する</td>
+<td>ファイル一覧の取得、ダウンロード</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>新しく作る・送る</td>
+<td>ファイルのアップロード</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>削除する</td>
+<td>ファイルの削除</td>
+</tr>
+</tbody>
+</table>
+<h4 id="jsonjavascript-object-notation">JSON（JavaScript Object Notation）<a class="headerlink" href="#jsonjavascript-object-notation" title="Permanent link">&para;</a></h4>
+<p>データをテキストで表現するフォーマット。API のレスポンスによく使われる。
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;report.pdf&quot;</span><span class="p">,</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">&quot;size&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">102400</span><span class="p">,</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">&quot;lastModified&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-05-09T10:00:00Z&quot;</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">}</span>
+</code></pre></div>
+バックエンドがこの形式でファイル情報を返し、フロントエンドが受け取って画面に表示する。</p>
+<hr />
+<h3 id="nodejs-npm">Node.js / npm<a class="headerlink" href="#nodejs-npm" title="Permanent link">&para;</a></h3>
+<h4 id="nodejs">Node.js<a class="headerlink" href="#nodejs" title="Permanent link">&para;</a></h4>
+<p>JavaScript をブラウザ以外（サーバー上）で動かすための実行環境。
+今回のバックエンドは Node.js 上で動く。EC2 にインストールするのはこれ。</p>
+<h4 id="npmnode-package-manager">npm（Node Package Manager）<a class="headerlink" href="#npmnode-package-manager" title="Permanent link">&para;</a></h4>
+<p>Node.js のパッケージ（ライブラリ）を管理するツール。
+「必要な部品を自動で取ってくる」役割。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>npm<span class="w"> </span>install<span class="w">       </span><span class="c1"># package.json に書かれた依存ライブラリを一括インストール</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>npm<span class="w"> </span>run<span class="w"> </span>build<span class="w">     </span><span class="c1"># TypeScript → JavaScript に変換してアプリを本番向けにまとめる</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>npm<span class="w"> </span>start<span class="w">         </span><span class="c1"># アプリを起動する</span>
+</code></pre></div>
+<h4 id="packagejson">package.json<a class="headerlink" href="#packagejson" title="Permanent link">&para;</a></h4>
+<p>そのアプリが依存しているライブラリの一覧と、使えるコマンドが書かれた設定ファイル。
+<code>npm install</code> を実行すると、ここに書かれたライブラリが自動でダウンロードされる。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;dependencies&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">&quot;express&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^4.21.0&quot;</span><span class="p">,</span><span class="w">    </span><span class="err">←</span><span class="w"> </span><span class="err">アプリの動作に必要なライブラリ</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="nt">&quot;@aws-sdk/client-s3&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^3.0.0&quot;</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nt">&quot;scripts&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="nt">&quot;build&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tsc&quot;</span><span class="p">,</span><span class="w">          </span><span class="err">←</span><span class="w"> </span><span class="kc">n</span><span class="err">pm</span><span class="w"> </span><span class="err">ru</span><span class="kc">n</span><span class="w"> </span><span class="err">build</span><span class="w"> </span><span class="err">で実行されるコマンド</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="nt">&quot;start&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;node dist/index.js&quot;</span><span class="w">  </span><span class="err">←</span><span class="w"> </span><span class="kc">n</span><span class="err">pm</span><span class="w"> </span><span class="err">s</span><span class="kc">tart</span><span class="w"> </span><span class="err">で実行されるコマンド</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">}</span>
+</code></pre></div>
+<h4 id="node_modules">node_modules/<a class="headerlink" href="#node_modules" title="Permanent link">&para;</a></h4>
+<p><code>npm install</code> でダウンロードされたライブラリが入るフォルダ。
+サイズが大きく（数百MB）、GitHub にはアップロードしない（<code>.gitignore</code> で除外）。
+EC2 でも毎回 <code>npm install</code> を実行してダウンロードし直す。</p>
+<h4 id="env">.env ファイル<a class="headerlink" href="#env" title="Permanent link">&para;</a></h4>
+<p>アプリの設定値（S3バケット名など）を記述するファイル。
+ソースコードに直接書かずに外部ファイルにまとめることで、本番・ローカルで値を切り替えやすくなる。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>S3_BUCKET_NAME=handson-yamada-files
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>AWS_REGION=ap-northeast-1
+</code></pre></div>
+<p><strong><code>.env</code> は GitHub にアップロードしてはいけない。</strong>
+アクセスキーなどの機密情報が含まれることがあるため。</p>
+<hr />
+<h3 id="typescript">TypeScript / ビルド<a class="headerlink" href="#typescript" title="Permanent link">&para;</a></h3>
+<h4 id="typescript_1">TypeScript<a class="headerlink" href="#typescript_1" title="Permanent link">&para;</a></h4>
+<p>JavaScript に「型」を追加した言語。
+変数や関数の引数に型を指定することで、バグを事前に防ぎやすくなる。
+ブラウザや Node.js は JavaScript しか実行できないため、<strong>ビルド</strong>が必要。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// TypeScript（.ts）で書いたコード</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">function</span><span class="w"> </span><span class="nx">greet</span><span class="p">(</span><span class="nx">name</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="kt">string</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="sb">`こんにちは、</span><span class="si">${</span><span class="nx">name</span><span class="si">}</span><span class="sb">さん`</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">}</span>
+</code></pre></div>
+<h4 id="_18">ビルド（コンパイル）<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h4>
+<p>TypeScript（<code>.ts</code>）のコードを、Node.js やブラウザが実行できる JavaScript（<code>.js</code>）に変換する作業。
+<code>npm run build</code> を実行すると自動で行われる。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>TypeScript (.ts) ──[ビルド]──→ JavaScript (.js)
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>  人間が書く                     サーバーが実行する
+</code></pre></div>
+<h4 id="dist">dist/ フォルダ<a class="headerlink" href="#dist" title="Permanent link">&para;</a></h4>
+<p>ビルドした JavaScript ファイルが出力されるフォルダ。
+<code>npm run build</code> を実行すると生成される。
+<code>npm start</code> は <code>dist/index.js</code> を実行する。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>backend/
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>├── src/         ← 人間が書く TypeScript ファイル
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>│   └── index.ts
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>└── dist/        ← ビルドで生成される JavaScript ファイル（自動生成）
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>    └── index.js
+</code></pre></div>
+<hr />
+<h3 id="express">Express（バックエンドフレームワーク）<a class="headerlink" href="#express" title="Permanent link">&para;</a></h3>
+<h4 id="express_1">Express<a class="headerlink" href="#express_1" title="Permanent link">&para;</a></h4>
+<p>Node.js で Web サーバーを作るためのフレームワーク（部品集）。
+「どの URL にアクセスされたら何を返すか」を簡潔に書ける。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nx">app</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">&#39;/api/files&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">req</span><span class="p">,</span><span class="w"> </span><span class="nx">res</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="c1">// GET /api/files にアクセスされたときの処理</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nx">res</span><span class="p">.</span><span class="nx">json</span><span class="p">([{</span><span class="w"> </span><span class="nx">key</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;report.pdf&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">size</span><span class="o">:</span><span class="w"> </span><span class="kt">1024</span><span class="w"> </span><span class="p">}])</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="p">})</span>
+</code></pre></div>
+<h4 id="_19">エンドポイント<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h4>
+<p>API の「受け付け窓口」。URL と HTTP メソッドの組み合わせのこと。
+今回のアプリは以下のエンドポイントを持つ:</p>
+<table>
+<thead>
+<tr>
+<th>エンドポイント</th>
+<th>処理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /api/files</code></td>
+<td>S3のファイル一覧を返す</td>
+</tr>
+<tr>
+<td><code>POST /api/files/upload</code></td>
+<td>ファイルをS3にアップロード</td>
+</tr>
+<tr>
+<td><code>GET /api/files/download/:key</code></td>
+<td>S3からファイルをダウンロード</td>
+</tr>
+<tr>
+<td><code>DELETE /api/files/:key</code></td>
+<td>S3のファイルを削除</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="react-vite">React / Vite（フロントエンド）<a class="headerlink" href="#react-vite" title="Permanent link">&para;</a></h3>
+<h4 id="react">React<a class="headerlink" href="#react" title="Permanent link">&para;</a></h4>
+<p>Facebook が開発した JavaScript の UI ライブラリ。
+「コンポーネント」という部品を組み合わせて画面を作る。
+今回の「ファイル一覧」「アップロードボタン」はそれぞれ別のコンポーネントとして作られている。</p>
+<h4 id="vite">Vite（ヴィート）<a class="headerlink" href="#vite" title="Permanent link">&para;</a></h4>
+<p>React アプリの開発サーバーを高速に起動するツール。
+ローカル開発では <code>npm run dev</code> でViteが起動し <code>http://localhost:5173</code> でアプリが見られる。
+<code>npm run build</code> を実行すると <code>dist/</code> フォルダに本番用のファイルが出力される。</p>
+<h4 id="spasingle-page-application">SPA（Single Page Application）<a class="headerlink" href="#spasingle-page-application" title="Permanent link">&para;</a></h4>
+<p>ページ遷移のたびにHTMLを再読み込みせず、JavaScript でページ内容を書き換えるWebアプリの形式。
+今回のフロントエンドはSPA。ブラウザが最初にHTMLを1回読み込み、以降は API でデータだけ取得して画面を更新する。</p>
+<hr />
+<h3 id="git-github">Git / GitHub<a class="headerlink" href="#git-github" title="Permanent link">&para;</a></h3>
+<h4 id="git">Git<a class="headerlink" href="#git" title="Permanent link">&para;</a></h4>
+<p>ソースコードのバージョン管理ツール。「いつ・誰が・何を変えたか」の履歴を記録できる。</p>
+<h4 id="github">GitHub<a class="headerlink" href="#github" title="Permanent link">&para;</a></h4>
+<p>Git のリポジトリをインターネット上に保存・公開できるサービス。
+今回のアプリコードは GitHub で管理し、EC2 からクローンして使う。</p>
+<h4 id="git-clone">git clone<a class="headerlink" href="#git-clone" title="Permanent link">&para;</a></h4>
+<p>GitHub 上のリポジトリをEC2にコピーしてくるコマンド。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ohtsuka-shota-se/samurai-repo.git
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="c1"># → samurai-repo/ フォルダが作成される</span>
+</code></pre></div>
+<h4 id="git-pull">git pull<a class="headerlink" href="#git-pull" title="Permanent link">&para;</a></h4>
+<p>すでにクローン済みのリポジトリに、GitHub 側の最新変更を取り込むコマンド。
+コードが更新された際に EC2 へ反映するために使う。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>git<span class="w"> </span>pull<span class="w">   </span><span class="c1"># GitHub の最新版でローカルを更新する</span>
+</code></pre></div>
+<hr />
+<h3 id="aws-sdk">AWS SDK<a class="headerlink" href="#aws-sdk" title="Permanent link">&para;</a></h3>
+<h4 id="aws-sdksoftware-development-kit">AWS SDK（Software Development Kit）<a class="headerlink" href="#aws-sdksoftware-development-kit" title="Permanent link">&para;</a></h4>
+<p>アプリのコードから AWS のサービスを操作するためのライブラリ。
+今回は <code>@aws-sdk/client-s3</code> を使い、Node.js のコードから S3 にファイルを保存・取得している。
+SDK が IAMロールの認証情報を自動で読み取るため、アクセスキーをコードに書かなくて済む。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1">// SDK を使ったS3操作のイメージ</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kd">const</span><span class="w"> </span><span class="nx">s3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">S3Client</span><span class="p">({</span><span class="w"> </span><span class="nx">region</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;ap-northeast-1&#39;</span><span class="w"> </span><span class="p">})</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">await</span><span class="w"> </span><span class="nx">s3</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">ListObjectsV2Command</span><span class="p">({</span><span class="w"> </span><span class="nx">Bucket</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;handson-yamada-files&#39;</span><span class="w"> </span><span class="p">}))</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="c1">// → S3バケットのファイル一覧が返ってくる</span>
+</code></pre></div>
+<hr />
+<h2 id="1-vpc">[1] VPC作成<a class="headerlink" href="#1-vpc" title="Permanent link">&para;</a></h2>
+<p>EC2を置くためのプライベートネットワーク環境を作る。</p>
+<h3 id="1-1-vpc">1-1. VPCを作成する<a class="headerlink" href="#1-1-vpc" title="Permanent link">&para;</a></h3>
+<ol>
+<li>サービス検索で「VPC」を開く</li>
+<li>左メニュー「お客様の VPC」→「VPCを作成」</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>作成するリソース</td>
+<td><strong>VPCのみ</strong></td>
+</tr>
+<tr>
+<td>名前タグ</td>
+<td><code>handson-vpc</code></td>
+</tr>
+<tr>
+<td>IPv4 CIDR</td>
+<td><code>10.0.0.0/16</code></td>
+</tr>
+<tr>
+<td>IPv6 CIDR</td>
+<td>なし</td>
+</tr>
+<tr>
+<td>テナンシー</td>
+<td>デフォルト</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「VPCを作成」をクリック</li>
+</ol>
+<hr />
+<h3 id="1-2">1-2. インターネットゲートウェイを作成してアタッチする<a class="headerlink" href="#1-2" title="Permanent link">&para;</a></h3>
+<ol>
+<li>左メニュー「インターネットゲートウェイ」→「インターネットゲートウェイの作成」</li>
+<li>名前タグ: <code>handson-igw</code> → 「インターネットゲートウェイの作成」</li>
+<li>作成後、画面上部の「<strong>VPCにアタッチ</strong>」をクリック</li>
+<li><code>handson-vpc</code> を選択 → 「インターネットゲートウェイのアタッチ」</li>
+</ol>
+<hr />
+<h3 id="1-3">1-3. パブリックサブネットを作成する<a class="headerlink" href="#1-3" title="Permanent link">&para;</a></h3>
+<ol>
+<li>左メニュー「サブネット」→「サブネットを作成」</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPC ID</td>
+<td><code>handson-vpc</code></td>
+</tr>
+<tr>
+<td>サブネット名</td>
+<td><code>handson-public-subnet</code></td>
+</tr>
+<tr>
+<td>アベイラビリティゾーン</td>
+<td><code>ap-northeast-1a</code>（東京）</td>
+</tr>
+<tr>
+<td>IPv4 CIDR</td>
+<td><code>10.0.0.0/24</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「サブネットを作成」をクリック</li>
+<li>作成したサブネットを選択 →「アクション」→「<strong>サブネットの設定を編集</strong>」</li>
+<li>「パブリック IPv4 アドレスの自動割り当てを有効化」に<strong>チェックを入れて保存</strong></li>
+<li>これを有効にしないと EC2 にパブリックIPが割り当てられない</li>
+</ol>
+<hr />
+<h3 id="1-4">1-4. ルートテーブルを作成してサブネットに関連付ける<a class="headerlink" href="#1-4" title="Permanent link">&para;</a></h3>
+<ol>
+<li>左メニュー「ルートテーブル」→「ルートテーブルを作成」</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>名前</td>
+<td><code>handson-public-rt</code></td>
+</tr>
+<tr>
+<td>VPC</td>
+<td><code>handson-vpc</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「ルートテーブルを作成」をクリック</li>
+<li>作成した <code>handson-public-rt</code> を選択 →「<strong>ルート</strong>」タブ→「ルートを編集」</li>
+<li>「ルートを追加」をクリックし以下を入力:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>送信先</th>
+<th>ターゲット</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0.0.0.0/0</code></td>
+<td><code>handson-igw</code>（インターネットゲートウェイ）</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「変更を保存」</li>
+<li>「<strong>サブネットの関連付け</strong>」タブ →「サブネットの関連付けを編集」</li>
+<li><code>handson-public-subnet</code> にチェックを入れて「関連付けを保存」</li>
+</ol>
+<hr />
+<h2 id="2-s3">[2] S3バケット作成<a class="headerlink" href="#2-s3" title="Permanent link">&para;</a></h2>
+<ol>
+<li>AWSマネジメントコンソールにログイン</li>
+<li>サービス検索で「S3」を開く</li>
+<li>「バケットを作成」をクリック</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>バケット名</td>
+<td><code>handson-[自分の名前]-files</code>（例: <code>handson-yamada-files</code>）※全世界で一意</td>
+</tr>
+<tr>
+<td>AWSリージョン</td>
+<td>アジアパシフィック（東京） ap-northeast-1</td>
+</tr>
+<tr>
+<td>オブジェクト所有権</td>
+<td>ACL無効</td>
+</tr>
+<tr>
+<td>パブリックアクセスをすべてブロック</td>
+<td><strong>オン</strong>（デフォルトのまま）</td>
+</tr>
+<tr>
+<td>バージョニング</td>
+<td>無効</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>「バケットを作成」をクリック</li>
+<li><strong>作成したバケット名をメモしておく</strong></li>
+</ol>
+<hr />
+<h2 id="3-iam">[3] IAMロール作成<a class="headerlink" href="#3-iam" title="Permanent link">&para;</a></h2>
+<p>EC2がS3にアクセスするための「通行証」（IAMロール）を作る。</p>
+<ol>
+<li>サービス検索で「IAM」を開く</li>
+<li>左メニュー「ロール」→「ロールを作成」</li>
+<li>以下を設定:</li>
+</ol>
+<p><strong>ステップ1: 信頼されたエンティティを選択</strong>
+- エンティティタイプ: <strong>AWSのサービス</strong>
+- ユースケース: <strong>EC2</strong>
+- 「次へ」</p>
+<p><strong>ステップ2: 許可ポリシー</strong>
+- 検索欄に <code>AmazonS3FullAccess</code> と入力
+- <code>AmazonS3FullAccess</code> にチェックを入れる
+- 「次へ」</p>
+<p><strong>ステップ3: 名前と確認</strong>
+- ロール名: <code>handson-ec2-role</code>
+- 「ロールを作成」</p>
+<hr />
+<h2 id="4-ec2">[4] EC2インスタンス起動<a class="headerlink" href="#4-ec2" title="Permanent link">&para;</a></h2>
+<ol>
+<li>サービス検索で「EC2」を開く</li>
+<li>「インスタンスを起動」をクリック</li>
+<li>以下を設定:</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>名前</td>
+<td><code>handson-server</code></td>
+</tr>
+<tr>
+<td>AMI</td>
+<td>Ubuntu Server 24.04 LTS（64ビット x86）</td>
+</tr>
+<tr>
+<td>インスタンスタイプ</td>
+<td><code>t2.micro</code>（無料利用枠）</td>
+</tr>
+<tr>
+<td>キーペア</td>
+<td>新しいキーペアを作成 → 名前: <code>handson-key</code>、タイプ: RSA、形式: .pem → ダウンロードして保存</td>
+</tr>
+</tbody>
+</table>
+<p><strong>ネットワーク設定:</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>設定値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPC</td>
+<td><code>handson-vpc</code></td>
+</tr>
+<tr>
+<td>サブネット</td>
+<td><code>handson-public-subnet</code></td>
+</tr>
+<tr>
+<td>パブリックIPの自動割り当て</td>
+<td><strong>有効</strong>（サブネット設定に従う）</td>
+</tr>
+</tbody>
+</table>
+<p>「セキュリティグループを作成」を選択し、以下のルールを追加:
+名前は<code>handson-ec2-sg</code>とする</p>
+<table>
+<thead>
+<tr>
+<th>タイプ</th>
+<th>ポート</th>
+<th>ソース</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SSH</td>
+<td>22</td>
+<td>マイIP</td>
+<td>EC2への接続</td>
+</tr>
+<tr>
+<td>カスタムTCP</td>
+<td>3000</td>
+<td>0.0.0.0/0</td>
+<td>アプリへのアクセス</td>
+</tr>
+</tbody>
+</table>
+<p><strong>高度な詳細:</strong>
+- IAMインスタンスプロファイル: <code>handson-ec2-role</code> を選択</p>
+<ol>
+<li>「インスタンスを起動」をクリック</li>
+<li>インスタンス一覧に戻り、<strong>パブリックIPアドレスをメモ</strong>（起動完了後に表示される）</li>
+</ol>
+<hr />
+<h2 id="5-ec2sshnodejs">[5] EC2にSSH接続・Node.jsセットアップ<a class="headerlink" href="#5-ec2sshnodejs" title="Permanent link">&para;</a></h2>
+<h3 id="ssh">SSHの接続<a class="headerlink" href="#ssh" title="Permanent link">&para;</a></h3>
+<p><strong>Mac / Linux の場合:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>chmod<span class="w"> </span><span class="m">400</span><span class="w"> </span>~/Downloads/handson-key.pem
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>ssh<span class="w"> </span>-i<span class="w"> </span>~/Downloads/handson-key.pem<span class="w"> </span>ubuntu@<span class="o">[</span>EC2のパブリックIP<span class="o">]</span>
+</code></pre></div></p>
+<p><strong>Windows（PowerShell）の場合:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">ssh</span> <span class="n">-i</span> <span class="n">C</span><span class="p">:\</span><span class="n">Users</span><span class="p">\[</span><span class="n">ユーザー名</span><span class="p">]\</span><span class="n">Downloads</span><span class="p">\</span><span class="n">handson-key</span><span class="p">.</span><span class="n">pem</span> <span class="n">ubuntu</span><span class="p">@</span><span class="no">[EC2のパブリックIP]</span>
+</code></pre></div></p>
+<p>接続できたら以下が表示される:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>ubuntu@ip-xxx-xxx-xxx-xxx:~$
+</code></pre></div></p>
+<h3 id="nodejs_1">Node.jsのインストール<a class="headerlink" href="#nodejs_1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># rootに切り替えてパッケージ一覧の更新</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>sudo<span class="w"> </span>su<span class="w"> </span>-
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>apt<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt<span class="w"> </span>upgrade<span class="w"> </span>-y
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Node.js 22.x のインストール（LTS）</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>curl<span class="w"> </span>-fsSL<span class="w"> </span>https://deb.nodesource.com/setup_22.x<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash<span class="w"> </span>-
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>nodejs
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="c1"># バージョン確認</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>node<span class="w"> </span>-v<span class="w">   </span><span class="c1"># v22.x.x と表示されればOK</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a>npm<span class="w"> </span>-v<span class="w">    </span><span class="c1"># 10.x.x と表示されればOK</span>
+</code></pre></div>
+<hr />
+<h2 id="6">[6] アプリのクローン・ビルド・起動<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
+<h3 id="5-1">5-1. リポジトリをクローンする<a class="headerlink" href="#5-1" title="Permanent link">&para;</a></h3>
+<p><strong>実行場所: ホームディレクトリ <code>~</code></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ohtsuka-shota-se/samurai-repo.git
+</code></pre></div>
+<p>実行後、<code>samurai-repo</code> フォルダが作成される。</p>
+<hr />
+<h3 id="5-2">5-2. フロントエンドをビルドする<a class="headerlink" href="#5-2" title="Permanent link">&para;</a></h3>
+<p><strong>実行場所: <code>~/samurai-repo/phase01/frontend</code></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo/phase01/frontend
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>npm<span class="w"> </span>install
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>npm<span class="w"> </span>run<span class="w"> </span>build
+</code></pre></div>
+<p><code>dist/</code> フォルダが生成されれば成功。</p>
+<hr />
+<h3 id="5-3">5-3. バックエンドをセットアップする<a class="headerlink" href="#5-3" title="Permanent link">&para;</a></h3>
+<p><strong>実行場所: <code>~/samurai-repo/phase01/backend</code></strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo/phase01/backend
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>npm<span class="w"> </span>install
+</code></pre></div>
+<hr />
+<h3 id="5-4-s3">5-4. S3バケット名を設定する<a class="headerlink" href="#5-4-s3" title="Permanent link">&para;</a></h3>
+<p><strong>実行場所: <code>~/samurai-repo/phase01/backend</code>（5-3の続き）</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>nano<span class="w"> </span>.env
+</code></pre></div>
+<p><code>nano</code> が開いたら <code>S3_BUCKET_NAME=</code> の右側を自分のバケット名に書き換える:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>S3_BUCKET_NAME=handson-yamada-files   ← ここだけ変更する
+</code></pre></div>
+<p>保存して終了: <code>Ctrl + O</code> → <code>Enter</code> → <code>Ctrl + X</code></p>
+<hr />
+<h3 id="5-5">5-5. ビルドして起動する<a class="headerlink" href="#5-5" title="Permanent link">&para;</a></h3>
+<p><strong>実行場所: <code>~/samurai-repo/phase01/backend</code>（5-3の続き）</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>npm<span class="w"> </span>start
+</code></pre></div>
+<p>以下のように表示されたら起動成功:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>サーバー起動: http://localhost:3000
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>S3バケット: handson-yamada-files
+</code></pre></div>
+<hr />
+<blockquote>
+<p><strong>EC2再起動後のアプリ再起動手順:</strong>
+EC2を停止→起動した場合、アプリは自動起動しない。再度SSHで接続して以下を実行する。
+また、停止→起動するとパブリックIPが変わる点に注意。</p>
+<p><strong>実行場所: <code>~/samurai-repo/phase01/backend</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo/phase01/backend
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>npm<span class="w"> </span>start
+</code></pre></div></p>
+</blockquote>
+<hr />
+<blockquote>
+<p><strong>コードが更新された場合のEC2への適用手順:</strong></p>
+<p><strong>実行場所: <code>~/samurai-repo</code></strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>git<span class="w"> </span>pull
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="nb">cd</span><span class="w"> </span>phase01/frontend
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>npm<span class="w"> </span>install
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="nb">cd</span><span class="w"> </span>../backend
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>npm<span class="w"> </span>install
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>npm<span class="w"> </span>run<span class="w"> </span>build
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>npm<span class="w"> </span>start
+</code></pre></div></p>
+</blockquote>
+<hr />
+<h2 id="7">[7] ブラウザで動作確認<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<p>ブラウザで以下にアクセス:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>http://[EC2のパブリックIP]:3000
+</code></pre></div></p>
+<h3 id="_20">動作確認チェックリスト<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h3>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 画面が表示される（「AWS S3 ファイル管理」というタイトル）</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> ファイル一覧が表示される（初回は「ファイルがありません」と表示）</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> ファイルをアップロードできる（日本語ファイル名も含む）</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> アップロードしたファイルが一覧に表示される</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> ファイルをダウンロードできる</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> ファイルを削除できる</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> S3コンソールでも同じファイルが確認できる</li>
+</ul>
+<hr />
+<h2 id="_21">トラブルシューティング<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h2>
+<h3 id="_22">画面が表示されない場合<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h3>
+<ol>
+<li>EC2のセキュリティグループでポート3000が開放されているか確認</li>
+<li>アプリが起動しているか確認（ターミナルにエラーが出ていないか）</li>
+</ol>
+<hr />
+<h3 id="_23">「ファイル一覧の取得に失敗しました」と表示される場合<a class="headerlink" href="#_23" title="Permanent link">&para;</a></h3>
+<p><strong>手順1: IAMロールがEC2に認識されているか確認</strong></p>
+<p>通常の curl では応答がない場合がある。以下のIMDSv2形式で確認すること:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">&quot;http://169.254.169.254/latest/api/token&quot;</span><span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-aws-ec2-metadata-token-ttl-seconds: 21600&quot;</span><span class="k">)</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>curl<span class="w"> </span>-s<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;X-aws-ec2-metadata-token: </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span>http://169.254.169.254/latest/meta-data/iam/info
+</code></pre></div>
+<p><code>"Code" : "Success"</code> が返れば認識されている。何も返らない場合はIAMロールがアタッチされていない。</p>
+<p>→ EC2コンソール →「アクション」→「セキュリティ」→「IAMロールを変更」でロールをアタッチする。</p>
+<p><strong>手順2: Node.jsでS3接続を直接テスト</strong></p>
+<p>Ubuntu 24.04 では <code>apt install awscli</code> が使えない。代わりに以下で確認:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="c1"># バックエンドフォルダで実行</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nb">cd</span><span class="w"> </span>~/samurai-repo/phase01/backend
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>node<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="s2">const { S3Client, ListObjectsV2Command } = require(&#39;@aws-sdk/client-s3&#39;);</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="s2">const client = new S3Client({ region: &#39;ap-northeast-1&#39; });</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="s2">client.send(new ListObjectsV2Command({ Bucket: &#39;[バケット名]&#39; }))</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="s2">  .then(r =&gt; console.log(&#39;接続成功&#39;))</span>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="s2">  .catch(e =&gt; console.error(&#39;エラー:&#39;, e.name, e.message));</span>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="s2">&quot;</span>
+</code></pre></div>
+<p><strong>手順3: .envファイルの確認</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>cat<span class="w"> </span>~/samurai-repo/phase01/backend/.env
+</code></pre></div>
+<p><code>S3_BUCKET_NAME</code> が正しいバケット名になっているか確認する。</p>
+<hr />
+<h3 id="_24">ハンズオン終了時の注意（費用発生を防ぐため）<a class="headerlink" href="#_24" title="Permanent link">&para;</a></h3>
+<p>EC2は<strong>起動中に料金が発生</strong>します。ハンズオン終了後は必ず停止すること。</p>
+<ol>
+<li>EC2コンソールでインスタンスを選択</li>
+<li>「インスタンスの状態」→「インスタンスを停止」</li>
+</ol>
+<blockquote>
+<p>※「終了（削除）」すると次回使えなくなる。「停止」にする。
+※ 停止中はEC2の料金は発生しないが、EBSの料金はわずかに発生する（無料枠内に収まる）。</p>
+</blockquote>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  ページトップへ戻る
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

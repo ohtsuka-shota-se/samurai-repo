@@ -1,0 +1,2198 @@
+
+<!doctype html>
+<html lang="ja" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="AWS の主要サービスを段階的に学ぶためのハンズオン手順書">
+      
+      
+      
+        <link rel="canonical" href="https://ohtsuka-shota-se.github.io/samurai-repo/08_CloudWatch_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="prev" href="../07_CloudFront_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        <link rel="next" href="../09_CodeCommit_CICD_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Phase 8 - CloudWatch・SNS（監視） - AWS 学習ハンズオン</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#phase-08-cloudwatch-logs-sns" class="md-skip">
+          コンテンツにスキップ
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="ヘッダー">
+    <a href=".." title="AWS 学習ハンズオン" class="md-header__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AWS 学習ハンズオン
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Phase 8 - CloudWatch・SNS（監視）
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-orange" data-md-color-accent="orange"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="検索" placeholder="検索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="検索">
+        
+        <button type="reset" class="md-search__icon md-icon" title="クリア" aria-label="クリア" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            検索を初期化
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="タブ" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  ホーム
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  ハンズオン手順書
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-tabs__link">
+          
+  
+  
+  参考資料
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="ナビゲーション" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AWS 学習ハンズオン" class="md-nav__button md-logo" aria-label="AWS 学習ハンズオン" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AWS 学習ハンズオン
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ホーム
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ハンズオン手順書
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    ハンズオン手順書
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01_EC2_S3_IAM_VPC_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1 - EC2・S3・IAM・VPC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02_Cognito_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 2 - Cognito（認証）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03_DynamoDB_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 3 - DynamoDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../04_Lambda_SNS_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 4 - Lambda・SNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05_Bedrock_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 5 - Bedrock（AI）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06_ALB_AutoScaling_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 6 - ALB・Auto Scaling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../07_CloudFront_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 7 - CloudFront（CDN）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 8 - CloudWatch・SNS（監視）
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 8 - CloudWatch・SNS（監視）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        手順
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="手順">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-iam-cloudwatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. IAM ロールに CloudWatch 権限を追加
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-ec2-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. EC2 に SSH 接続
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-cloudwatch-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. CloudWatch Agent をインストール
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-pm2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. PM2 のログパスを確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-cloudwatch-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. CloudWatch Agent の設定ファイルを作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-cloudwatch-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. CloudWatch Agent を起動
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-cloudwatch-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. CloudWatch Logs でログが届いているか確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-sns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. SNS トピックの作成・メール購読登録
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. SNS トピックの作成・メール購読登録">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8-1-sns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-1. SNS トピックを作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-2. メールアドレスにサブスクリプションを作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-metric-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Metric Filter を作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-cloudwatch-alarm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. CloudWatch Alarm を作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 動作確認（テスト）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. 動作確認（テスト）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-1. テストログを手動で出力する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-2-cloudwatch-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-2. CloudWatch Logs で確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-3. メトリクスを確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-4. メール通知を確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. 後片付け（学習終了後）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        トラブルシューティング
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="トラブルシューティング">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handsonpm2error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /handson/pm2/error がいつまでも表示されない
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="/handson/pm2/error がいつまでも表示されない">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        原因1: エラーログファイルに書き込みがない
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        原因2: 設定ファイルのパスにスペースや誤りがある
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent が起動しない・停止している
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        本手順で学べること
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../09_CodeCommit_CICD_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 9 - CodeCommit・CI/CD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../10_ECS_Fargate_%E3%83%8F%E3%83%B3%E3%82%BA%E3%82%AA%E3%83%B3%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 10 - ECS/Fargate（コンテナ化）
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    参考資料
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    参考資料
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83%E3%81%AErun-dev%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ローカル開発環境のセットアップ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../%E4%BF%AE%E6%AD%A3%E3%83%BB%E5%A4%89%E6%9B%B4%E5%B1%A5%E6%AD%B4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    修正・変更履歴
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../GitHub%E7%AE%A1%E7%90%86%E6%96%B9%E9%87%9D%E3%81%A8push%E6%89%8B%E9%A0%86/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GitHub管理方針
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目次">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目次
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        完成後イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        環境イメージ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前提条件
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        手順
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="手順">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-iam-cloudwatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. IAM ロールに CloudWatch 権限を追加
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-ec2-ssh" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. EC2 に SSH 接続
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-cloudwatch-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. CloudWatch Agent をインストール
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-pm2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. PM2 のログパスを確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-cloudwatch-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. CloudWatch Agent の設定ファイルを作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-cloudwatch-agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. CloudWatch Agent を起動
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-cloudwatch-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. CloudWatch Logs でログが届いているか確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-sns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. SNS トピックの作成・メール購読登録
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. SNS トピックの作成・メール購読登録">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#8-1-sns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-1. SNS トピックを作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8-2. メールアドレスにサブスクリプションを作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#9-metric-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Metric Filter を作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-cloudwatch-alarm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. CloudWatch Alarm を作成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 動作確認（テスト）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. 動作確認（テスト）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-1. テストログを手動で出力する
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-2-cloudwatch-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-2. CloudWatch Logs で確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-3. メトリクスを確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11-4. メール通知を確認
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. 後片付け（学習終了後）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        トラブルシューティング
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="トラブルシューティング">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#handsonpm2error" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /handson/pm2/error がいつまでも表示されない
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="/handson/pm2/error がいつまでも表示されない">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        原因1: エラーログファイルに書き込みがない
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        原因2: 設定ファイルのパスにスペースや誤りがある
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#agent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent が起動しない・停止している
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        本手順で学べること
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="phase-08-cloudwatch-logs-sns">Phase 08: CloudWatch Logs + SNS アラート ハンズオン手順<a class="headerlink" href="#phase-08-cloudwatch-logs-sns" title="Permanent link">&para;</a></h1>
+<h2 id="_1">完成後イメージ<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>EC2 上で PM2 が管理する Node.js アプリのログを CloudWatch Logs に集約し、<br />
+エラーを検知したら SNS 経由でメール通知が届く監視環境を構築する。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>EC2（PM2 + Node.js）
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ↓ ログファイル出力
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>CloudWatch Agent
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>CloudWatch Logs（ロググループ: /handson/pm2/error）
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  ↓ Metric Filter（ERROR を検知）
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>CloudWatch Alarm（5分以内に1件以上でアラート）
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  ↓
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>SNS Topic（handson-alert-topic）
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>  ↓
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>メール通知（登録アドレスに届く）
+</code></pre></div>
+<hr />
+<h2 id="_2">環境イメージ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>graph TB
+    User["👤 ユーザー\n（ブラウザ）"]
+    EMAIL["📧 メール通知"]
+
+    subgraph Virginia["us-east-1（バージニア）"]
+        CF["🌐 CloudFront\nhandson-cloudfront"]
+    end
+
+    subgraph Tokyo["ap-northeast-1（東京）"]
+        Cognito["🔐 Cognito\nhandson-user-pool"]
+
+        subgraph VPC["VPC: handson-vpc"]
+            ALB["⚖️ ALB: handson-alb"]
+            subgraph SubnetA["subnet-1a"]
+                EC2A["🖥️ EC2\nPM2 + Node.js\n📡 CloudWatch Agent"]
+            end
+            subgraph SubnetC["subnet-1c"]
+                EC2C["🖥️ EC2\nPM2 + Node.js\n📡 CloudWatch Agent"]
+            end
+            ALB --&gt; EC2A
+            ALB --&gt; EC2C
+        end
+
+        S3["🪣 S3\nhandson-[名前]-files"]
+        DDB["🗄️ DynamoDB\nhandson-reviews"]
+
+        subgraph CW["CloudWatch（Phase 08 で追加）"]
+            CWL["📋 CloudWatch Logs\n/handson/pm2/out\n/handson/pm2/error"]
+            MF["🔍 Metric Filter\nERROR を検知"]
+            ALARM["🔔 CloudWatch Alarm\n5分以内に1件以上でアラート"]
+        end
+
+        SNS["📨 SNS Topic\nhandson-alert-topic"]
+    end
+
+    User --&gt;|HTTPS| CF
+    CF --&gt;|HTTP| ALB
+    EC2A --&gt;|ログ転送| CWL
+    EC2C --&gt;|ログ転送| CWL
+    EC2A --&gt; S3
+    EC2A --&gt; DDB
+    EC2A --&gt;|JWT検証| Cognito
+    CWL --&gt; MF
+    MF --&gt; ALARM
+    ALARM --&gt; SNS
+    SNS --&gt;|メール送信| EMAIL</code></pre>
+<hr />
+<h2 id="_3">前提条件<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>確認内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EC2 が起動していること</td>
+<td>EC2 コンソールで <code>running</code> を確認（Phase 06 または 07 で作成した EC2）</td>
+</tr>
+<tr>
+<td>PM2 でアプリが動いていること</td>
+<td>EC2 に SSH して <code>pm2 list</code> で <code>online</code> を確認</td>
+</tr>
+<tr>
+<td>handson-ec2-role が EC2 にアタッチされていること</td>
+<td>EC2 詳細 → IAM ロール欄を確認</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>✅ <strong>ALB・CloudFront は起動していなくて構わない。</strong><br />
+本手順は EC2 上の PM2 プロセスを監視するものであり、ALB・CloudFront は不要。<br />
+費用削減のため、使用しない場合は停止・削除したままで問題ない。</p>
+</blockquote>
+<hr />
+<h2 id="_4">手順<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h3 id="1-iam-cloudwatch">1. IAM ロールに CloudWatch 権限を追加<a class="headerlink" href="#1-iam-cloudwatch" title="Permanent link">&para;</a></h3>
+<p>CloudWatch Agent が EC2 からログを送信するために、<br />
+<code>handson-ec2-role</code> に AWS 管理ポリシーを追加する。</p>
+<ol>
+<li>IAM コンソール → <strong>ロール</strong> → <code>handson-ec2-role</code> を開く</li>
+<li><strong>許可を追加</strong> → <strong>ポリシーをアタッチ</strong> をクリック</li>
+<li>検索欄に <code>CloudWatchAgentServerPolicy</code> と入力</li>
+<li><code>CloudWatchAgentServerPolicy</code> にチェック → <strong>許可を追加</strong> をクリック</li>
+</ol>
+<hr />
+<h3 id="2-ec2-ssh">2. EC2 に SSH 接続<a class="headerlink" href="#2-ec2-ssh" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ssh<span class="w"> </span>-i<span class="w"> </span>~/.ssh/<span class="o">[</span>キーペア名<span class="o">]</span>.pem<span class="w"> </span>ubuntu@&lt;EC2のパブリックIP&gt;
+</code></pre></div>
+<hr />
+<h3 id="3-cloudwatch-agent">3. CloudWatch Agent をインストール<a class="headerlink" href="#3-cloudwatch-agent" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>wget<span class="w"> </span>https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>dpkg<span class="w"> </span>-i<span class="w"> </span>./amazon-cloudwatch-agent.deb
+</code></pre></div>
+<p>インストール確認：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl<span class="w"> </span>--version
+</code></pre></div>
+<hr />
+<h3 id="4-pm2">4. PM2 のログパスを確認<a class="headerlink" href="#4-pm2" title="Permanent link">&para;</a></h3>
+<p>設定ファイルに記載するため、PM2 のログ保存先を確認する。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>pm2<span class="w"> </span>info<span class="w"> </span>handson-app
+</code></pre></div>
+<blockquote>
+<p><code>Log file</code> の欄に表示されるパスを控える。<br />
+例: <code>/root/.pm2/logs/handson-app-out.log</code> / <code>/root/.pm2/logs/handson-app-error.log</code></p>
+</blockquote>
+<hr />
+<h3 id="5-cloudwatch-agent">5. CloudWatch Agent の設定ファイルを作成<a class="headerlink" href="#5-cloudwatch-agent" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+</code></pre></div>
+<p>以下を貼り付ける（ログパスは手順 4 で確認した値に合わせて修正）：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">&quot;logs&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">&quot;logs_collected&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">      </span><span class="nt">&quot;files&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="nt">&quot;collect_list&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">          </span><span class="p">{</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">            </span><span class="nt">&quot;file_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/root/.pm2/logs/*-out.log&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">            </span><span class="nt">&quot;log_group_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/handson/pm2/out&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">            </span><span class="nt">&quot;log_stream_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{instance_id}&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">            </span><span class="nt">&quot;timestamp_format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;%Y-%m-%dT%H:%M:%S&quot;</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">          </span><span class="p">},</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">          </span><span class="p">{</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">            </span><span class="nt">&quot;file_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/root/.pm2/logs/*-error.log&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">            </span><span class="nt">&quot;log_group_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/handson/pm2/error&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">            </span><span class="nt">&quot;log_stream_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{instance_id}&quot;</span><span class="p">,</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">            </span><span class="nt">&quot;timestamp_format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;%Y-%m-%dT%H:%M:%S&quot;</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">          </span><span class="p">}</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">        </span><span class="p">]</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">      </span><span class="p">}</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="p">}</span>
+</code></pre></div>
+<blockquote>
+<p>⚠️ <code>file_path</code> は手順 4 で確認した実際のパスに合わせること。<br />
+ワイルドカード <code>*</code> を使うと複数ファイルをまとめて収集できる。</p>
+</blockquote>
+<p>保存: <code>Ctrl+X</code> → <code>Y</code> → <code>Enter</code></p>
+<hr />
+<h3 id="6-cloudwatch-agent">6. CloudWatch Agent を起動<a class="headerlink" href="#6-cloudwatch-agent" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>-a<span class="w"> </span>fetch-config<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>-m<span class="w"> </span>ec2<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>-c<span class="w"> </span>file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span>-s
+</code></pre></div>
+<p>状態確認：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>sudo<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span>-a<span class="w"> </span>status
+</code></pre></div>
+<p><code>"status": "running"</code> が表示されれば OK。</p>
+<p>自動起動の設定：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>amazon-cloudwatch-agent
+</code></pre></div>
+<hr />
+<h3 id="7-cloudwatch-logs">7. CloudWatch Logs でログが届いているか確認<a class="headerlink" href="#7-cloudwatch-logs" title="Permanent link">&para;</a></h3>
+<ol>
+<li>CloudWatch コンソール → <strong>ロググループ</strong> を開く</li>
+<li><code>/handson/pm2/out</code> と <code>/handson/pm2/error</code> が作成されていることを確認</li>
+<li>ロググループ → ログストリームをクリックしてログが表示されることを確認</li>
+</ol>
+<blockquote>
+<p>⏱️ Agent 起動後、最初のログが届くまで 1〜2 分かかる場合がある。</p>
+<p><strong><code>/handson/pm2/error</code> が表示されない場合:</strong>
+エラーログファイルに一度も書き込みがないとロググループが作成されない。
+EC2 に SSH して以下を実行し、テスト用のエラーログを書き込む。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>-Iseconds<span class="k">)</span><span class="s2"> ERROR: テスト用エラーログ&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/root/.pm2/logs/handson-app-error.log
+</code></pre></div>
+<p>1〜2 分後に CloudWatch コンソールを更新すると <code>/handson/pm2/error</code> が表示される。</p>
+</blockquote>
+<hr />
+<h3 id="8-sns">8. SNS トピックの作成・メール購読登録<a class="headerlink" href="#8-sns" title="Permanent link">&para;</a></h3>
+<h4 id="8-1-sns">8-1. SNS トピックを作成<a class="headerlink" href="#8-1-sns" title="Permanent link">&para;</a></h4>
+<ol>
+<li>SNS コンソール → <strong>トピック</strong> → <strong>トピックの作成</strong> をクリック</li>
+<li>以下を入力：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>タイプ</td>
+<td>スタンダード</td>
+</tr>
+<tr>
+<td>名前</td>
+<td><code>handson-alert-topic</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>トピックの作成</strong> をクリック</li>
+<li>表示された <strong>ARN</strong> を控えておく（後の手順で使用）</li>
+</ol>
+<h4 id="8-2">8-2. メールアドレスにサブスクリプションを作成<a class="headerlink" href="#8-2" title="Permanent link">&para;</a></h4>
+<ol>
+<li>作成したトピック → <strong>サブスクリプションの作成</strong> をクリック</li>
+<li>以下を入力：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>プロトコル</td>
+<td>Eメール</td>
+</tr>
+<tr>
+<td>エンドポイント</td>
+<td>通知を受け取るメールアドレス</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>サブスクリプションの作成</strong> をクリック</li>
+<li>登録メールアドレスに確認メールが届くので <strong>Confirm subscription</strong> リンクをクリック</li>
+</ol>
+<blockquote>
+<p>⚠️ 確認リンクをクリックしないと通知が届かない。</p>
+</blockquote>
+<hr />
+<h3 id="9-metric-filter">9. Metric Filter を作成<a class="headerlink" href="#9-metric-filter" title="Permanent link">&para;</a></h3>
+<p>エラーログから <code>ERROR</code> を含む行を検知するフィルターを作成する。</p>
+<ol>
+<li>CloudWatch コンソール → <strong>ロググループ</strong> → <code>/handson/pm2/error</code> を開く</li>
+<li><strong>メトリクスフィルター</strong> タブ → <strong>メトリクスフィルターの作成</strong> をクリック</li>
+<li>以下を入力：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>フィルターパターン</td>
+<td><code>ERROR</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>次へ</strong> をクリック</li>
+<li>メトリクスの詳細を入力：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>フィルター名</td>
+<td><code>handson-pm2-error-filter</code></td>
+</tr>
+<tr>
+<td>メトリクス名前空間</td>
+<td><code>HandsonApp</code></td>
+</tr>
+<tr>
+<td>メトリクス名</td>
+<td><code>PM2ErrorCount</code></td>
+</tr>
+<tr>
+<td>メトリクス値</td>
+<td><code>1</code></td>
+</tr>
+<tr>
+<td>デフォルト値</td>
+<td><code>0</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>次へ</strong> → <strong>メトリクスフィルターの作成</strong> をクリック</li>
+</ol>
+<hr />
+<h3 id="10-cloudwatch-alarm">10. CloudWatch Alarm を作成<a class="headerlink" href="#10-cloudwatch-alarm" title="Permanent link">&para;</a></h3>
+<p>Metric Filter から直接アラームを作成する。この方法ならメトリクスにデータが届いていない状態でも設定できる。</p>
+<ol>
+<li>CloudWatch コンソール → <strong>ロググループ</strong> → <code>/handson/pm2/error</code> を開く</li>
+<li><strong>「メトリクスフィルター」</strong> タブをクリック</li>
+<li><code>handson-pm2-error-filter</code> の左側の <strong>チェックボックスにチェック</strong> を入れる</li>
+<li>右上に表示される <strong>「アラームを作成」</strong> をクリック</li>
+<li>条件を設定：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>統計</td>
+<td>合計（Sum）</td>
+</tr>
+<tr>
+<td>期間</td>
+<td>5分</td>
+</tr>
+<tr>
+<td>条件</td>
+<td>以上（&gt;=）</td>
+</tr>
+<tr>
+<td>閾値</td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>次へ</strong> をクリック</li>
+<li>通知の設定：</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>アラーム状態トリガー</td>
+<td>アラーム状態（ALARM）</td>
+</tr>
+<tr>
+<td>SNS トピック</td>
+<td><code>handson-alert-topic</code>（既存のトピックを選択）</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>次へ</strong> → アラーム名に <code>handson-pm2-error-alarm</code> を入力</li>
+<li><strong>アラームの作成</strong> をクリック</li>
+</ol>
+<hr />
+<h3 id="11">11. 動作確認（テスト）<a class="headerlink" href="#11" title="Permanent link">&para;</a></h3>
+<h4 id="11-1">11-1. テストログを手動で出力する<a class="headerlink" href="#11-1" title="Permanent link">&para;</a></h4>
+<p>EC2 に SSH 接続して、エラーログに <code>ERROR</code> を含む行を書き込む。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>-Iseconds<span class="k">)</span><span class="s2"> ERROR: テスト用エラーログ&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/root/.pm2/logs/handson-app-error.log
+</code></pre></div>
+<h4 id="11-2-cloudwatch-logs">11-2. CloudWatch Logs で確認<a class="headerlink" href="#11-2-cloudwatch-logs" title="Permanent link">&para;</a></h4>
+<ol>
+<li>CloudWatch コンソール → <code>/handson/pm2/error</code> → ログストリームを開く</li>
+<li>書き込んだ <code>ERROR</code> ログが表示されることを確認</li>
+</ol>
+<h4 id="11-3">11-3. メトリクスを確認<a class="headerlink" href="#11-3" title="Permanent link">&para;</a></h4>
+<ol>
+<li>CloudWatch コンソール → <strong>メトリクス</strong> → <strong>すべてのメトリクス</strong> → <code>HandsonApp</code> → <code>PM2ErrorCount</code></li>
+<li>グラフに値が上がっていることを確認</li>
+</ol>
+<h4 id="11-4">11-4. メール通知を確認<a class="headerlink" href="#11-4" title="Permanent link">&para;</a></h4>
+<ol>
+<li>CloudWatch コンソール → <strong>アラーム</strong> → <code>handson-pm2-error-alarm</code> の状態を確認</li>
+<li>5分以内に <strong>ALARM</strong> 状態に変わる</li>
+<li>登録メールアドレスにアラート通知が届く</li>
+</ol>
+<blockquote>
+<p>⏱️ アラームが ALARM 状態になるまで最大 5 分かかる。</p>
+</blockquote>
+<p>届くメールの内容は以下のような形式になる。各項目の見方を確認しておこう。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>件名: ALARM: &quot;handson-pm2-error-alarm&quot; in Asia Pacific (Tokyo)
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>You are receiving this email because your Amazon CloudWatch Alarm
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>&quot;handson-pm2-error-alarm&quot; in the Asia Pacific (Tokyo) region has
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>entered the ALARM state, because &quot;Threshold Crossed: 1 out of the
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>last 1 datapoints [4.0 (30/05/26 14:20:00)] was greater than or
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>equal to the threshold (1.0).&quot;
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>Alarm Details:
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>- Name:                 handson-pm2-error-alarm
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>- State Change:         INSUFFICIENT_DATA -&gt; ALARM        ← 状態の遷移
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>- Reason for State Change:
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>    Threshold Crossed: 1 out of the last 1 datapoints
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>    [4.0] was greater than or equal to the threshold (1.0).
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>- Timestamp:            Saturday 30 May, 2026 14:30:59 UTC
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>- AWS Account:          xxxxxxxxxxxx                      ← アカウントID（各自異なる）
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>- Alarm Arn:            arn:aws:cloudwatch:ap-northeast-1:xxxxxxxxxxxx:alarm:handson-pm2-error-alarm
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a>Threshold:
+<a id="__codelineno-12-20" name="__codelineno-12-20" href="#__codelineno-12-20"></a>- The alarm is in the ALARM state when the metric is
+<a id="__codelineno-12-21" name="__codelineno-12-21" href="#__codelineno-12-21"></a>  GreaterThanOrEqualToThreshold 1.0 for at least 1 of the
+<a id="__codelineno-12-22" name="__codelineno-12-22" href="#__codelineno-12-22"></a>  last 1 period(s) of 300 seconds.                        ← 5分間で1件以上
+<a id="__codelineno-12-23" name="__codelineno-12-23" href="#__codelineno-12-23"></a>
+<a id="__codelineno-12-24" name="__codelineno-12-24" href="#__codelineno-12-24"></a>Monitored Metric:
+<a id="__codelineno-12-25" name="__codelineno-12-25" href="#__codelineno-12-25"></a>- MetricNamespace:      HandsonApp
+<a id="__codelineno-12-26" name="__codelineno-12-26" href="#__codelineno-12-26"></a>- MetricName:           PM2ErrorCount
+<a id="__codelineno-12-27" name="__codelineno-12-27" href="#__codelineno-12-27"></a>- Period:               300 seconds                       ← 監視間隔（5分）
+<a id="__codelineno-12-28" name="__codelineno-12-28" href="#__codelineno-12-28"></a>- Statistic:            Sum                               ← 集計方法（合計）
+<a id="__codelineno-12-29" name="__codelineno-12-29" href="#__codelineno-12-29"></a>- TreatMissingData:     missing                           ← データ欠損時の扱い
+<a id="__codelineno-12-30" name="__codelineno-12-30" href="#__codelineno-12-30"></a>
+<a id="__codelineno-12-31" name="__codelineno-12-31" href="#__codelineno-12-31"></a>State Change Actions:
+<a id="__codelineno-12-32" name="__codelineno-12-32" href="#__codelineno-12-32"></a>- ALARM: [arn:aws:sns:ap-northeast-1:xxxxxxxxxxxx:handson-alert-topic]
+</code></pre></div>
+<p><strong>メールの主な見どころ:</strong></p>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>意味</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>State Change</code></td>
+<td>アラームの状態変化。<code>INSUFFICIENT_DATA → ALARM</code> はデータ取得後初めて閾値を超えたことを示す</td>
+</tr>
+<tr>
+<td><code>Reason for State Change</code></td>
+<td>何件のデータが閾値を超えたかの詳細</td>
+</tr>
+<tr>
+<td><code>Period: 300 seconds</code></td>
+<td>5分ごとにメトリクスを評価していることを示す</td>
+</tr>
+<tr>
+<td><code>TreatMissingData: missing</code></td>
+<td>データがない期間はアラーム評価をスキップする設定</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="12">12. 後片付け（学習終了後）<a class="headerlink" href="#12" title="Permanent link">&para;</a></h3>
+<p>学習終了後にリソースを削除してコストを抑える。</p>
+<table>
+<thead>
+<tr>
+<th>リソース</th>
+<th>削除場所</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CloudWatch Alarm</td>
+<td>CloudWatch → アラーム → <code>handson-pm2-error-alarm</code> を削除</td>
+</tr>
+<tr>
+<td>Metric Filter</td>
+<td>CloudWatch → ロググループ → <code>/handson/pm2/error</code> → メトリクスフィルタータブ → 削除</td>
+</tr>
+<tr>
+<td>ロググループ</td>
+<td>CloudWatch → ロググループ → <code>/handson/pm2/out</code> <code>/handson/pm2/error</code> を削除</td>
+</tr>
+<tr>
+<td>SNS トピック</td>
+<td>SNS → トピック → <code>handson-alert-topic</code> を削除</td>
+</tr>
+<tr>
+<td>SNS サブスクリプション</td>
+<td>SNS → サブスクリプション → 削除（トピック削除時に自動削除される）</td>
+</tr>
+<tr>
+<td>CloudWatch Agent</td>
+<td>EC2 上で停止（EC2 自体を停止するなら不要）</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_5">トラブルシューティング<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h3 id="handsonpm2error"><code>/handson/pm2/error</code> がいつまでも表示されない<a class="headerlink" href="#handsonpm2error" title="Permanent link">&para;</a></h3>
+<h4 id="1">原因1: エラーログファイルに書き込みがない<a class="headerlink" href="#1" title="Permanent link">&para;</a></h4>
+<p>ロググループはログファイルに書き込みが発生して初めて作成される。
+以下でテスト用のエラーログを書き込む。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>date<span class="w"> </span>-Iseconds<span class="k">)</span><span class="s2"> ERROR: テスト用エラーログ&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/root/.pm2/logs/handson-app-error.log
+</code></pre></div>
+<p>1〜2 分後に CloudWatch コンソールを更新して確認する。</p>
+<hr />
+<h4 id="2">原因2: 設定ファイルのパスにスペースや誤りがある<a class="headerlink" href="#2" title="Permanent link">&para;</a></h4>
+<p>Agent が実際に監視しているファイルは <code>state/</code> フォルダで確認できる。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>ls<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/logs/state/
+</code></pre></div>
+<p><code>_root_.pm2_logs_handson-app-out.log</code> はあるが <code>_root_.pm2_logs_handson-app-error.log</code> がない場合、
+<code>error.log</code> が監視対象になっていない。</p>
+<p>設定ファイルの中身を確認する：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>sudo<span class="w"> </span>cat<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json
+</code></pre></div>
+<p><code>file_path</code> の値に <strong>先頭スペース</strong> などが入っていないか確認する。</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nt">&quot;file_path&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot; /root/.pm2/logs/handson-app-error.log&quot;</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">              </span><span class="err">↑</span><span class="w"> </span><span class="err">このようなスペースがあると監視されない</span>
+</code></pre></div>
+<p><strong>修正手順:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>sudo<span class="w"> </span>nano<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json
+</code></pre></div>
+<p>スペースを削除して保存したあと、設定を再読み込みする：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>sudo<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span>-a<span class="w"> </span>fetch-config<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span>-m<span class="w"> </span>ec2<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span>-c<span class="w"> </span>file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span>-s
+</code></pre></div>
+<p>再度 <code>state/</code> を確認し、<code>error</code> のファイルが追加されていれば監視開始されている。</p>
+<hr />
+<h3 id="agent">Agent が起動しない・停止している<a class="headerlink" href="#agent" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>amazon-cloudwatch-agent
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>sudo<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl<span class="w"> </span>-a<span class="w"> </span>status
+</code></pre></div>
+<p><code>"status": "running"</code> になれば OK。</p>
+<p>Agent 自身のログでエラー内容を確認することもできる：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>sudo<span class="w"> </span>tail<span class="w"> </span>-50<span class="w"> </span>/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
+</code></pre></div>
+<hr />
+<h2 id="_6">本手順で学べること<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CloudWatch Agent</td>
+<td>EC2 にインストールしてログを CloudWatch に転送する仕組み</td>
+</tr>
+<tr>
+<td>CloudWatch Logs</td>
+<td>ロググループ・ログストリームの構造とログ収集</td>
+</tr>
+<tr>
+<td>Metric Filter</td>
+<td>ログのテキストパターンからメトリクスを生成する方法</td>
+</tr>
+<tr>
+<td>CloudWatch Alarm</td>
+<td>メトリクス閾値監視とアラーム状態の仕組み</td>
+</tr>
+<tr>
+<td>SNS</td>
+<td>トピック・サブスクリプションによるメール通知の仕組み</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  ページトップへ戻る
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f", "clipboard.copy": "\u30af\u30ea\u30c3\u30d7\u30dc\u30fc\u30c9\u3078\u30b3\u30d4\u30fc", "search.result.more.one": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3082\u30461\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.more.other": "\u3053\u306e\u30da\u30fc\u30b8\u5185\u306b\u3042\u3068#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.none": "\u4f55\u3082\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f", "search.result.one": "1\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.other": "#\u4ef6\u898b\u3064\u304b\u308a\u307e\u3057\u305f", "search.result.placeholder": "\u691c\u7d22\u30ad\u30fc\u30ef\u30fc\u30c9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044", "search.result.term.missing": "\u691c\u7d22\u306b\u542b\u307e\u308c\u306a\u3044", "select.version": "\u30d0\u30fc\u30b8\u30e7\u30f3\u5207\u308a\u66ff\u3048"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

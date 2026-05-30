@@ -52,7 +52,7 @@ CloudWatch Agent が EC2 からログを送信するために、
 ### 2. EC2 に SSH 接続
 
 ```bash
-ssh -i ~/.ssh/ohtsuka-key.pem ec2-user@<EC2のパブリックIP>
+ssh -i ~/.ssh/ohtsuka-key.pem ubuntu@<EC2のパブリックIP>
 ```
 
 ---
@@ -60,7 +60,8 @@ ssh -i ~/.ssh/ohtsuka-key.pem ec2-user@<EC2のパブリックIP>
 ### 3. CloudWatch Agent をインストール
 
 ```bash
-sudo yum install amazon-cloudwatch-agent -y
+wget https://amazoncloudwatch-agent.s3.amazonaws.com/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i ./amazon-cloudwatch-agent.deb
 ```
 
 インストール確認：

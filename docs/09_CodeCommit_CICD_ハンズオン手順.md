@@ -232,7 +232,7 @@ CodeCommit コンソールでコードが表示されれば成功。
 ### 3-1. EC2 に SSH 接続する
 
 ```bash
-ssh -i ~/.ssh/ohtsuka-key.pem ubuntu@<EC2のパブリックIP>
+ssh -i ~/.ssh/[キーペア名].pem ubuntu@<EC2のパブリックIP>
 ```
 
 ---

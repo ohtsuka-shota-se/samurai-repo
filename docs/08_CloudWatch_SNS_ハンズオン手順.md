@@ -52,7 +52,7 @@ CloudWatch Agent が EC2 からログを送信するために、
 ### 2. EC2 に SSH 接続
 
 ```bash
-ssh -i ~/.ssh/ohtsuka-key.pem ubuntu@<EC2のパブリックIP>
+ssh -i ~/.ssh/[キーペア名].pem ubuntu@<EC2のパブリックIP>
 ```
 
 ---

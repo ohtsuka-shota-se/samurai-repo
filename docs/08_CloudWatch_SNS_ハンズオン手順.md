@@ -289,6 +289,52 @@ echo "$(date -Iseconds) ERROR: テスト用エラーログ" >> /root/.pm2/logs/h
 
 > ⏱️ アラームが ALARM 状態になるまで最大 5 分かかる。
 
+届くメールの内容は以下のような形式になる。各項目の見方を確認しておこう。
+
+```
+件名: ALARM: "handson-pm2-error-alarm" in Asia Pacific (Tokyo)
+
+You are receiving this email because your Amazon CloudWatch Alarm
+"handson-pm2-error-alarm" in the Asia Pacific (Tokyo) region has
+entered the ALARM state, because "Threshold Crossed: 1 out of the
+last 1 datapoints [4.0 (30/05/26 14:20:00)] was greater than or
+equal to the threshold (1.0)."
+
+Alarm Details:
+- Name:                 handson-pm2-error-alarm
+- State Change:         INSUFFICIENT_DATA -> ALARM        ← 状態の遷移
+- Reason for State Change:
+    Threshold Crossed: 1 out of the last 1 datapoints
+    [4.0] was greater than or equal to the threshold (1.0).
+- Timestamp:            Saturday 30 May, 2026 14:30:59 UTC
+- AWS Account:          xxxxxxxxxxxx                      ← アカウントID（各自異なる）
+- Alarm Arn:            arn:aws:cloudwatch:ap-northeast-1:xxxxxxxxxxxx:alarm:handson-pm2-error-alarm
+
+Threshold:
+- The alarm is in the ALARM state when the metric is
+  GreaterThanOrEqualToThreshold 1.0 for at least 1 of the
+  last 1 period(s) of 300 seconds.                        ← 5分間で1件以上
+
+Monitored Metric:
+- MetricNamespace:      HandsonApp
+- MetricName:           PM2ErrorCount
+- Period:               300 seconds                       ← 監視間隔（5分）
+- Statistic:            Sum                               ← 集計方法（合計）
+- TreatMissingData:     missing                           ← データ欠損時の扱い
+
+State Change Actions:
+- ALARM: [arn:aws:sns:ap-northeast-1:xxxxxxxxxxxx:handson-alert-topic]
+```
+
+**メールの主な見どころ:**
+
+| 項目 | 意味 |
+|------|------|
+| `State Change` | アラームの状態変化。`INSUFFICIENT_DATA → ALARM` はデータ取得後初めて閾値を超えたことを示す |
+| `Reason for State Change` | 何件のデータが閾値を超えたかの詳細 |
+| `Period: 300 seconds` | 5分ごとにメトリクスを評価していることを示す |
+| `TreatMissingData: missing` | データがない期間はアラーム評価をスキップする設定 |
+
 ---
 
 ### 12. 後片付け（学習終了後）

@@ -160,6 +160,16 @@ sudo systemctl enable amazon-cloudwatch-agent
 
 > ⏱️ Agent 起動後、最初のログが届くまで 1〜2 分かかる場合がある。
 
+> **`/handson/pm2/error` が表示されない場合:**
+> エラーログファイルに一度も書き込みがないとロググループが作成されない。
+> EC2 に SSH して以下を実行し、テスト用のエラーログを書き込む。
+>
+> ```bash
+> echo "$(date -Iseconds) ERROR: テスト用エラーログ" >> /root/.pm2/logs/handson-app-error.log
+> ```
+>
+> 1〜2 分後に CloudWatch コンソールを更新すると `/handson/pm2/error` が表示される。
+
 ---
 
 ### 8. SNS トピックの作成・メール購読登録
@@ -291,6 +301,84 @@ echo "$(date -Iseconds) ERROR: テスト用エラーログ" >> /root/.pm2/logs/h
 | SNS トピック | SNS → トピック → `handson-alert-topic` を削除 |
 | SNS サブスクリプション | SNS → サブスクリプション → 削除（トピック削除時に自動削除される） |
 | CloudWatch Agent | EC2 上で停止（EC2 自体を停止するなら不要） |
+
+---
+
+## トラブルシューティング
+
+### `/handson/pm2/error` がいつまでも表示されない
+
+#### 原因1: エラーログファイルに書き込みがない
+
+ロググループはログファイルに書き込みが発生して初めて作成される。
+以下でテスト用のエラーログを書き込む。
+
+```bash
+echo "$(date -Iseconds) ERROR: テスト用エラーログ" >> /root/.pm2/logs/handson-app-error.log
+```
+
+1〜2 分後に CloudWatch コンソールを更新して確認する。
+
+---
+
+#### 原因2: 設定ファイルのパスにスペースや誤りがある
+
+Agent が実際に監視しているファイルは `state/` フォルダで確認できる。
+
+```bash
+ls /opt/aws/amazon-cloudwatch-agent/logs/state/
+```
+
+`_root_.pm2_logs_handson-app-out.log` はあるが `_root_.pm2_logs_handson-app-error.log` がない場合、
+`error.log` が監視対象になっていない。
+
+設定ファイルの中身を確認する：
+
+```bash
+sudo cat /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json
+```
+
+`file_path` の値に **先頭スペース** などが入っていないか確認する。
+
+```json
+"file_path": " /root/.pm2/logs/handson-app-error.log"
+              ↑ このようなスペースがあると監視されない
+```
+
+**修正手順:**
+
+```bash
+sudo nano /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json
+```
+
+スペースを削除して保存したあと、設定を再読み込みする：
+
+```bash
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config \
+  -m ec2 \
+  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json \
+  -s
+```
+
+再度 `state/` を確認し、`error` のファイルが追加されていれば監視開始されている。
+
+---
+
+### Agent が起動しない・停止している
+
+```bash
+sudo systemctl restart amazon-cloudwatch-agent
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status
+```
+
+`"status": "running"` になれば OK。
+
+Agent 自身のログでエラー内容を確認することもできる：
+
+```bash
+sudo tail -50 /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
+```
 
 ---
 

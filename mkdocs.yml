@@ -47,6 +47,7 @@ nav:
     - Phase 6 - ALB・Auto Scaling: 06_ALB_AutoScaling_ハンズオン手順.md
     - Phase 7 - CloudFront（CDN）: 07_CloudFront_ハンズオン手順.md
     - Phase 8 - CloudWatch・SNS（監視）: 08_CloudWatch_SNS_ハンズオン手順.md
+    - Phase 9 - CodeCommit・CI/CD: 09_CodeCommit_CICD_ハンズオン手順.md
   - 参考資料:
     - ローカル開発環境のセットアップ: ローカル開発環境のrun-dev手順.md
     - 修正・変更履歴: 修正・変更履歴.md

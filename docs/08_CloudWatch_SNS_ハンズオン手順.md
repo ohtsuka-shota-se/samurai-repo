@@ -77,11 +77,11 @@ sudo dpkg -i ./amazon-cloudwatch-agent.deb
 設定ファイルに記載するため、PM2 のログ保存先を確認する。
 
 ```bash
-pm2 info backend
+pm2 info handson-app
 ```
 
 > `Log file` の欄に表示されるパスを控える。  
-> 例: `/root/.pm2/logs/backend-out.log` / `/root/.pm2/logs/backend-error.log`
+> 例: `/root/.pm2/logs/handson-app-out.log` / `/root/.pm2/logs/handson-app-error.log`
 
 ---
 
@@ -256,7 +256,7 @@ Metric Filter で作成したメトリクスが閾値を超えたら SNS に通�
 EC2 に SSH 接続して、エラーログに `ERROR` を含む行を書き込む。
 
 ```bash
-echo "$(date -Iseconds) ERROR: テスト用エラーログ" >> /root/.pm2/logs/backend-error.log
+echo "$(date -Iseconds) ERROR: テスト用エラーログ" >> /root/.pm2/logs/handson-app-error.log
 ```
 
 #### 11-2. CloudWatch Logs で確認

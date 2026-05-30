@@ -39,15 +39,39 @@ CodeDeploy（S3 からアーティファクトを取得 → EC2 に展開 → PM
 
 ```mermaid
 graph TB
-    Dev["💻 ローカル\n（開発者）"]
+    Dev["💻 ローカル（開発者）"]
+    User["👤 ユーザー（ブラウザ）"]
 
-    subgraph AWS["AWS クラウド (ap-northeast-1)"]
+    subgraph CICD["CI/CD（Phase 09 で追加）"]
         CC["📦 CodeCommit\nhandson-repo"]
         CP["🔁 CodePipeline\nhandson-pipeline"]
         CB["🔨 CodeBuild\nhandson-build"]
-        S3A["🪣 S3\nアーティファクト保存"]
+        S3A["🪣 S3\nアーティファクト"]
         CD["🚀 CodeDeploy\nhandson-app"]
-        EC2["🖥️ EC2\n(Ubuntu)\nPM2 + Node.js"]
+    end
+
+    subgraph Virginia["us-east-1（バージニア）"]
+        CF["🌐 CloudFront\nhandson-cloudfront"]
+    end
+
+    subgraph Tokyo["ap-northeast-1（東京）"]
+        Cognito["🔐 Cognito\nhandson-user-pool"]
+
+        subgraph VPC["VPC: handson-vpc"]
+            ALB["⚖️ ALB: handson-alb"]
+            subgraph SubnetA["subnet-1a"]
+                EC2A["🖥️ EC2\nPM2 + Node.js\n📡 CloudWatch Agent"]
+            end
+            subgraph SubnetC["subnet-1c"]
+                EC2C["🖥️ EC2\nPM2 + Node.js\n📡 CloudWatch Agent"]
+            end
+            ALB --> EC2A
+            ALB --> EC2C
+        end
+
+        S3["🪣 S3\nhandson-[名前]-files"]
+        DDB["🗄️ DynamoDB\nhandson-reviews"]
+        CWL["📋 CloudWatch Logs\n/handson/pm2/error"]
     end
 
     Dev -->|git push| CC
@@ -55,7 +79,16 @@ graph TB
     CP --> CB
     CB -->|ビルド済み成果物| S3A
     S3A --> CD
-    CD -->|デプロイ| EC2
+    CD -->|自動デプロイ| EC2A
+    CD -->|自動デプロイ| EC2C
+
+    User -->|HTTPS| CF
+    CF -->|HTTP| ALB
+    EC2A --> S3
+    EC2A --> DDB
+    EC2A -->|JWT検証| Cognito
+    EC2A -->|ログ転送| CWL
+    EC2C -->|ログ転送| CWL
 ```
 
 ---

@@ -42,31 +42,39 @@ graph TB
     Dev["💻 ローカル（開発者）"]
     User["👤 ユーザー（ブラウザ）"]
 
-    subgraph AWS["AWS クラウド (ap-northeast-1)"]
+    subgraph CICD["CI/CD（Phase 09 から継続・ECS 向けに更新）"]
         CC["📦 CodeCommit\nhandson-repo"]
-        CP["🔁 CodePipeline\nhandson-ecs-pipeline"]
-        CB["🔨 CodeBuild\nhandson-ecs-build"]
+        CP["🔁 CodePipeline\nhandson-pipeline"]
+        CB["🔨 CodeBuild\nhandson-build\n（Docker ビルド）"]
         ECR["🐳 ECR\nhandson-app"]
+    end
 
-        subgraph ECS["ECS クラスター: handson-cluster"]
-            T1["🟦 Fargate タスク\nパブリックIP:3000"]
+    subgraph Tokyo["ap-northeast-1（東京）"]
+        Cognito["🔐 Cognito\nhandson-user-pool"]
+
+        subgraph VPC["VPC: handson-vpc"]
+            subgraph ECS["ECS クラスター: handson-cluster（Phase 10 で追加）"]
+                T1["🟦 Fargate タスク\nhandson-service\nパブリックIP:3000"]
+            end
         end
 
-        DDB["🗄️ DynamoDB"]
-        S3["🪣 S3"]
-        Cognito["🔐 Cognito"]
+        S3["🪣 S3\nhandson-[名前]-files"]
+        DDB["🗄️ DynamoDB\nhandson-reviews"]
+        CWL["📋 CloudWatch Logs\n/ecs/handson-task"]
     end
 
     Dev -->|git push| CC
     CC --> CP
     CP --> CB
     CB -->|docker push| ECR
-    CB -->|ecs update-service| ECS
+    CB -->|ecs update-service| T1
     ECR -->|イメージ取得| T1
+
     User -->|http://IP:3000| T1
-    T1 --> DDB
     T1 --> S3
-    T1 --> Cognito
+    T1 --> DDB
+    T1 -->|JWT検証| Cognito
+    T1 -->|ログ転送| CWL
 ```
 
 ---

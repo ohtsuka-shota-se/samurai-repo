@@ -25,21 +25,50 @@ SNS Topic（handson-alert-topic）
 
 ```mermaid
 graph TB
-    EC2["🖥️ EC2（Ubuntu）\nPM2 + Node.js"]
-    CWA["📡 CloudWatch Agent\nEC2 上で動作"]
-    CWL_OUT["📋 CloudWatch Logs\n/handson/pm2/out"]
-    CWL_ERR["📋 CloudWatch Logs\n/handson/pm2/error"]
-    MF["🔍 Metric Filter\nhandson-pm2-error-filter\nERROR を検知"]
-    ALARM["🔔 CloudWatch Alarm\nhandson-pm2-error-alarm\n5分以内に1件以上でアラート"]
-    SNS["📨 SNS Topic\nhandson-alert-topic"]
+    User["👤 ユーザー\n（ブラウザ）"]
     EMAIL["📧 メール通知"]
 
-    EC2 -->|ログファイル出力| CWA
-    CWA -->|転送| CWL_OUT
-    CWA -->|転送| CWL_ERR
-    CWL_ERR --> MF
-    MF -->|カウント| ALARM
-    ALARM -->|ALARM 状態| SNS
+    subgraph Virginia["us-east-1（バージニア）"]
+        CF["🌐 CloudFront\nhandson-cloudfront"]
+    end
+
+    subgraph Tokyo["ap-northeast-1（東京）"]
+        Cognito["🔐 Cognito\nhandson-user-pool"]
+
+        subgraph VPC["VPC: handson-vpc"]
+            ALB["⚖️ ALB: handson-alb"]
+            subgraph SubnetA["subnet-1a"]
+                EC2A["🖥️ EC2\nPM2 + Node.js\n📡 CloudWatch Agent"]
+            end
+            subgraph SubnetC["subnet-1c"]
+                EC2C["🖥️ EC2\nPM2 + Node.js\n📡 CloudWatch Agent"]
+            end
+            ALB --> EC2A
+            ALB --> EC2C
+        end
+
+        S3["🪣 S3\nhandson-[名前]-files"]
+        DDB["🗄️ DynamoDB\nhandson-reviews"]
+
+        subgraph CW["CloudWatch（Phase 08 で追加）"]
+            CWL["📋 CloudWatch Logs\n/handson/pm2/out\n/handson/pm2/error"]
+            MF["🔍 Metric Filter\nERROR を検知"]
+            ALARM["🔔 CloudWatch Alarm\n5分以内に1件以上でアラート"]
+        end
+
+        SNS["📨 SNS Topic\nhandson-alert-topic"]
+    end
+
+    User -->|HTTPS| CF
+    CF -->|HTTP| ALB
+    EC2A -->|ログ転送| CWL
+    EC2C -->|ログ転送| CWL
+    EC2A --> S3
+    EC2A --> DDB
+    EC2A -->|JWT検証| Cognito
+    CWL --> MF
+    MF --> ALARM
+    ALARM --> SNS
     SNS -->|メール送信| EMAIL
 ```
 
